@@ -1,0 +1,23 @@
+{
+    "student_id": "ST0001",
+    "age": 18,
+    "first_name": "Bob",
+    "last_name": "Roger",
+    "email": "bob20@gmail.com",
+    "mentor_id": "MT0001",
+    
+    "assignments": [{
+        "assignment_id": "AS0001",
+        "date_due": "2023-04-01",
+        "date_issued": "2023-04-01",
+        "submission_date": "2023-04-01",
+        
+        "evaluation": {
+            "grade": 94,
+            "checked_date": "2023-04-01"
+        }
+    
+    }]
+}
+
+

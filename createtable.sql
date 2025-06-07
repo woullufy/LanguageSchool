@@ -77,24 +77,5 @@ create table group_membership(
     foreign key (student_group_id, course_id) references student_group(student_group_id, course_id) on delete cascade
 );
 
-
-
--- CREATE TRIGGER increment_participants
--- AFTER INSERT ON group_membership
--- FOR EACH ROW
--- BEGIN
---     UPDATE student_group
---     SET amount_of_participants = amount_of_participants + 1
---     WHERE student_group_id = NEW.student_group_id
---       AND course_id = NEW.course_id;
--- END;
-
--- CREATE TRIGGER decrement_participants
--- AFTER DELETE ON group_membership
--- FOR EACH ROW
--- UPDATE student_group
--- SET amount_of_participants = amount_of_participants - 1
--- WHERE student_group_id = OLD.student_group_id AND course_id = OLD.course_id;
-
 commit;
 

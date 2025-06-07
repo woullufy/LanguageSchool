@@ -10,20 +10,20 @@ from random import randint
 
 def create_connection():
     try:
-        # conn = mysql.connector.connect(
-        #     host="mariadb",
-        #     user="flaskuser",
-        #     password="flaskpass",
-        #     database="language_school"
-        # )
-
-        # Ilia's local mariadb connection
         conn = mysql.connector.connect(
-            host="localhost",
+            host="mariadb",
             user="flaskuser",
             password="flaskpass",
-            database="language_school",
+            database="language_school"
         )
+
+        # Ilia's local mariadb connection
+        # conn = mysql.connector.connect(
+        #     host="localhost",
+        #     user="flaskuser",
+        #     password="flaskpass",
+        #     database="language_school",
+        # )
         print("Successful connection to database!")
         return conn
     except Error as e:

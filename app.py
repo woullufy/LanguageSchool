@@ -10,26 +10,26 @@ import mysql.connector
 import subprocess
 import traceback
 from datetime import datetime
-from pymongo import MongoClient
+# from pymongo import MongoClient
 
 app = Flask(__name__)
 
-# def get_connection():
-#     return mysql.connector.connect(
-#         host="mariadb",                 # <- service name from docker-compose
-#         user="root",
-#         password="rootpass",
-#         database="language_school"
-#     )
-
-
 def get_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="flaskuser",
-        password="flaskpass",
-        database="language_school",
+        host="mariadb",                 # <- service name from docker-compose
+        user="root",
+        password="rootpass",
+        database="language_school"
     )
+
+
+# def get_connection():
+#     return mysql.connector.connect(
+#         host="localhost",
+#         user="flaskuser",
+#         password="flaskpass",
+#         database="language_school",
+#     )
 
 
 @app.route("/generate-data")
@@ -41,7 +41,7 @@ def generate_data():
     except subprocess.CalledProcessError as e:
         return "Error generating data", 500
 
-@app.rout("/migrate-to-nosql")
+# @app.rout("/migrate-to-nosql")
 
 @app.route("/tables")
 def show_tables():
@@ -190,7 +190,7 @@ def index():
 
 if __name__ == "__main__":
     # Ilia's docker settings
-    # app.run(host='0.0.0.0', port = 5050, debug=True)
+    app.run(host='0.0.0.0', port = 5050, debug=True)
 
     # Local host settings
-    app.run(debug=True)
+    # app.run(debug=True)

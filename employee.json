@@ -1,0 +1,18 @@
+[{
+    "employee_id": "MT0001",
+    "first_name": "Bob",
+    "last_name": "Roger",
+    "role": "mentor",
+    "xp_level": 10,
+    "amount_of_students": 10,
+    "supervise": "MT0005"
+}, 
+{
+    "employee_id": "TU0001",
+    "first_name": "Alice",
+    "last_name": "Margine",
+    "role": "tutor",
+    "years_of_experiece": 10,
+    "language_speciality": "French"
+}
+]
