@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Course</title>
+</head>
+<body>
+<h1>Select a Course</h1>
+
+<ul>
+    {% for course in courses %}
+    <li>
+        {{ course.title }}
+        <a href="/course-groups/{{ course.course_id }}">View Groups</a>
+    </li>
+    {% endfor %}
+</ul>
+
+<a href="/">Back to Students</a>
+</body>
+</html>

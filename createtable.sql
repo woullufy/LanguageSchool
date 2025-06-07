@@ -54,8 +54,8 @@ create table assignment(
     assignment_id varchar(50) primary key,
     date_issued datetime not null,
     date_due datetime not null,
-    submission_date datetime,
     from_student varchar(50) not null,
+    submission_date datetime,
     foreign key (from_student) references student(student_id) on delete cascade
 );
 

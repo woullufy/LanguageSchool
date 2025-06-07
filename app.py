@@ -25,7 +25,7 @@ def get_connection():
 
 # def get_connection():
 #     return mysql.connector.connect(
-#         host="localhost",
+#         host="mariadb",
 #         user="flaskuser",
 #         password="flaskpass",
 #         database="language_school",
@@ -42,6 +42,7 @@ def generate_data():
         return "Error generating data", 500
 
 # @app.rout("/migrate-to-nosql")
+#@app.rout("/migrate-to-nosql")
 
 @app.route("/tables")
 def show_tables():
@@ -63,6 +64,33 @@ def show_tables():
     cursor.close()
     conn.close()
     return render_template("tables.html", data=data)
+
+@app.route('/select-course')
+def select_course():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM course")
+    courses = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('select_course.html', courses=courses)
+
+@app.route('/course-groups/<course_id>')
+def course_groups(course_id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM student_group WHERE course_id = %s", (course_id,))
+    groups = cursor.fetchall()
+
+    cursor.execute("SELECT student_id, first_name, last_name FROM student")
+    students = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template('course_groups.html', groups=groups)
+
 
 
 @app.route("/submit-assignment", methods=["GET", "POST"])
@@ -192,5 +220,8 @@ if __name__ == "__main__":
     # Ilia's docker settings
     app.run(host='0.0.0.0', port = 5050, debug=True)
 
+    # app.run(host='0.0.0.0', port = 5050, debug=True)
+     app.run(host= '0.0.0.0', port = 5000, debug=True)
     # Local host settings
     # app.run(debug=True)
+    #app.run(debug=True)

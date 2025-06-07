@@ -3,7 +3,7 @@ services:
     build: .
     command: python -u app.py
     ports:
-      - "5050:5050"
+      - "5000:5000"
     volumes:
       - .:/app
     depends_on:

@@ -232,7 +232,7 @@ def insert_sample_data(conn, table_name, generated_data):
 connection = create_connection()
 delete_data(connection)
 faker = Faker()
-tutor_data = generate_data_tutor(20, faker)
+tutor_data = generate_data_tutor(5, faker)
 # insert_data_tutor(connection, tutor_data)
 insert_sample_data(connection, "employee", tutor_data)
 insert_sample_data(connection, "tutor", tutor_data)
@@ -244,7 +244,7 @@ insert_sample_data(connection, "mentor", mentor_data)
 student_data = generate_data_student(connection, 10, faker, mentor_data)
 insert_sample_data(connection, "student", student_data)
 
-course_data = generate_data_course(connection, 20, faker, tutor_data)
+course_data = generate_data_course(connection, 10, faker, tutor_data)
 insert_sample_data(connection, "course", course_data)
 
 group_data = generate_data_group(20, faker, course_data)
