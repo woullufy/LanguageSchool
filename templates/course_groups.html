@@ -1,0 +1,13 @@
+<h1>Groups for this Course</h1>
+<ul>
+    {% for group in groups %}
+    <li>
+        <strong>{{ group.student_group_id }}</strong>
+        <p>Age category: {{ group.age_category}}</p>
+        <p>Max members: {{ group.max_participants }}</p>
+        <p>Amount of members: {{ group.max_participants }}</p>
+    </li>
+    {% endfor %}
+</ul>
+
+<a href="/select-course">← Back to Courses</a>

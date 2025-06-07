@@ -46,6 +46,29 @@ def show_tables():
     conn.close()
     return render_template('tables.html', data=data)
 
+@app.route('/select-course')
+def select_course():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM course")
+    courses = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('select_course.html', courses=courses)
+
+@app.route('/course-groups/<course_id>')
+def course_groups(course_id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM student_group WHERE course_id = %s", (course_id,))
+    groups = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template('course_groups.html', groups=groups)
+
 
 @app.route('/')
 def index():
@@ -83,5 +106,7 @@ def add_student():
     conn.close()
     return redirect('/')
 
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port = 5000, debug=True)
+    app.run(host='0.0.0.0', port= 5000, debug=True)

@@ -55,6 +55,7 @@ create table assignment(
     date_issued datetime not null,
     date_due datetime not null,
     from_student varchar(50) not null,
+    submission_date datetime,
     foreign key (from_student) references student(student_id) on delete cascade
 );
 
@@ -62,6 +63,7 @@ create table checked_assignments(
     grade int default 0,
     assignment_id varchar(50) primary key,
     mentor_id varchar(50),
+    checked_date datetime,
     foreign key (assignment_id) references assignment(assignment_id) on delete cascade,
     foreign key (mentor_id) references mentor(mentor_id) on delete set null
 );
