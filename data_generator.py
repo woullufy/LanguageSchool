@@ -1,4 +1,5 @@
 # RUN pip install mysql-connector-python for docker
+from db_connections import get_mysql_connection
 from datetime import date
 import mysql.connector
 from mysql.connector import Error
@@ -6,30 +7,6 @@ from faker import Faker
 
 # need to be installed in docker
 from random import randint
-
-
-def create_connection():
-    try:
-        conn = mysql.connector.connect(
-            host="mariadb",
-            user="flaskuser",
-            password="flaskpass",
-            database="language_school"
-        )
-
-        # Ilia's local mariadb connection
-        # conn = mysql.connector.connect(
-        #     host="localhost",
-        #     user="flaskuser",
-        #     password="flaskpass",
-        #     database="language_school",
-        # )
-        print("Successful connection to database!")
-        return conn
-    except Error as e:
-        print(f"The error '{e}' occurred")
-    return None
-
 
 def delete_data(conn):
     cursor = conn.cursor()
@@ -228,8 +205,7 @@ def insert_sample_data(conn, table_name, generated_data):
     cursor.close()
     print(f"Inserted {len(generated_data)} records into {table_name}.")
 
-
-connection = create_connection()
+connection = get_mysql_connection()
 delete_data(connection)
 faker = Faker()
 tutor_data = generate_data_tutor(5, faker)
