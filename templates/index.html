@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Language School Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <h1>Welcome to the Language School Platform</h1>
+
+    <div class="dashboard">
+        <!-- Student -->
+        <div class="role-card">
+            <h2>🎓 Student</h2>
+            <form action="/submit-assignment" method="get">
+                <button type="submit">Submit Assignment</button>
+            </form>
+            <form action="/select-course" method="get">
+                <button type="submit">Select Group</button>
+            </form>
+        </div>
+
+        <!-- Mentor -->
+        <div class="role-card">
+            <h2>🧑‍🏫 Mentor</h2>
+            <form action="/grade-assignment" method="get">
+                <button type="submit">Grade Assignment</button>
+            </form>
+        </div>
+
+        <!-- Tutor -->
+        <div class="role-card">
+            <h2>🗣️ Tutor</h2>
+            <p>No tutor-specific features yet.</p>
+        </div>
+
+        <!-- Developer -->
+        <div class="role-card">
+            <h2>👩‍💻 Developer</h2>
+            <form action="/generate-data" method="get">
+                <button type="submit">Generate Fake Data</button>
+            </form>
+            <form action="/tables" method="get">
+                <button type="submit">View All Tables</button>
+            </form>
+            <form action="/submit-assignment" method="get">
+                <button type="submit">Test Submit Assignment</button>
+            </form>
+            <form action="/grade-assignment" method="get">
+                <button type="submit">Test Grade Assignment</button>
+            </form>
+        </div>
+    </div>
+
+    <form action="/migrate-to-nosql" method="get">
+        <button type="submit">Migrate to NoSQL</button>
+    </form>
+
+</body>
+
+</html>

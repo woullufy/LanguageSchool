@@ -1,0 +1,10 @@
+<h2>Select Mentor</h2>
+<form method="POST">
+  <label for="mentor_id">Mentor:</label>
+  <select name="mentor_id" required>
+    {% for m in mentors %}
+      <option value="{{ m.mentor_id }}">{{ m.mentor_id }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">View Assignments</button>
+</form>

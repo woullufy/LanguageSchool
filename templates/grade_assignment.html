@@ -1,0 +1,20 @@
+<h2>Grade Assignments</h2>
+<form method="POST">
+  <input type="hidden" name="mentor_id" value="{{ mentor_id }}">
+
+  <label for="assignment_id">Assignment:</label>
+  <select name="assignment_id" required>
+    {% for a in assignments %}
+      <option value="{{ a.assignment_id }}">
+        {{ a.assignment_id }} - {{ a.first_name }} {{ a.last_name }} (Submitted: {{ a.submission_date }})
+      </option>
+    {% endfor %}
+  </select>
+
+  <br><br>
+  <label for="grade">Grade (0–100):</label>
+  <input type="number" name="grade" min="0" max="100" required>
+
+  <br><br>
+  <button type="submit">Submit Grade</button>
+</form>

@@ -1,28 +1,35 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>All Tables</title>
 </head>
+
 <body>
     <h1>Database Tables</h1>
+    <form action="/" method="get">
+        <button type="submit" , class="submit-button">Home</button>
+    </form>
+
 
     {% for table, content in data.items() %}
-        <h2>{{ table }}</h2>
-        <table border="1" cellpadding="5">
-            <tr>
-                {% for col in content.columns %}
-                    <th>{{ col }}</th>
-                {% endfor %}
-            </tr>
-            {% for row in content.rows %}
-                <tr>
-                    {% for cell in row %}
-                        <td>{{ cell }}</td>
-                    {% endfor %}
-                </tr>
+    <h2>{{ table }}</h2>
+    <table border="1" cellpadding="5">
+        <tr>
+            {% for col in content.columns %}
+            <th>{{ col }}</th>
             {% endfor %}
-        </table>
-        <br>
+        </tr>
+        {% for row in content.rows %}
+        <tr>
+            {% for cell in row %}
+            <td>{{ cell }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
     {% endfor %}
 </body>
+
 </html>
