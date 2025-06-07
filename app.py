@@ -64,31 +64,70 @@ def show_tables():
     conn.close()
     return render_template("tables.html", data=data)
 
-@app.route('/select-course')
-def select_course():
+@app.route('/select-course/<student_id>', methods=["GET", "POST"])
+def select_course(student_id):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM course")
     courses = cursor.fetchall()
     cursor.close()
     conn.close()
-    return render_template('select_course.html', courses=courses)
+    if request.method == "POST":
+        course_id = request.form["course_id"]
+        student_id = request.form["student_id"]
+        return redirect(url_for('course_groups', course_id=course_id, student_id=student_id))
 
-@app.route('/course-groups/<course_id>')
-def course_groups(course_id):
+    return render_template('select_course.html', courses=courses, student_id= student_id)
+
+
+@app.route("/select-student", methods=["GET", "POST"])
+def select_student():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT student_id, first_name, last_name FROM student")
+    students = cursor.fetchall()
+    conn.close()
+
+    if request.method == "POST":
+        student_id = request.form["student_id"]
+        return redirect(url_for("select_course", student_id=student_id))
+
+    return render_template("select_student.html", students=students)
+
+
+@app.route("/course-groups/<course_id>/<student_id>", methods=["GET", "POST"])
+def course_groups(course_id, student_id):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute("SELECT * FROM student_group WHERE course_id = %s", (course_id,))
     groups = cursor.fetchall()
 
-    cursor.execute("SELECT student_id, first_name, last_name FROM student")
-    students = cursor.fetchall()
+    cursor.execute("SELECT title FROM course WHERE course_id = %s", (course_id,))
+    title = cursor.fetchone()
 
     cursor.close()
     conn.close()
 
-    return render_template('course_groups.html', groups=groups)
+    return render_template('course_groups.html', groups=groups, title=title, student_id=student_id)
+
+@app.route("/join-group/", methods=["POST"])
+def join_group():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    course_id = request.form["course_id"]
+    student_group_id = request.form["student_group_id"]
+    student_id = request.form["student_id"]
+
+    cursor.execute("INSERT INTO group_membership (student_id, student_group_id, course_id)"
+                   " VALUES (%s, %s, %s)", (student_id, student_group_id, course_id))
+    cursor.execute("UPDATE student_group SET amount_of_participants = amount_of_participants + 1 "
+                   "WHERE student_group_id = %s", (student_group_id,))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for("course_groups", course_id=course_id, student_id=student_id))
+
 
 
 

@@ -56,6 +56,8 @@ def delete_data(conn):
 
 def generate_data_tutor(x, faker):
     data = {}
+    languages = ["English", "French", "German", "Spanish", "Chinese", "Russian",
+                 "Italian", "Japanese", "Korean", "Arabic", "Turkish"]
     for i in range(0, x):
         data[i] = {}
         id = f"TU{str(i+1).zfill(4)}"
@@ -63,7 +65,7 @@ def generate_data_tutor(x, faker):
         data[i]["tutor_id"] = id
         data[i]["first_name"] = faker.first_name()
         data[i]["last_name"] = faker.last_name()
-        data[i]["language_speciality"] = faker.language_name()
+        data[i]["language_speciality"] = faker.random_element(languages)
         data[i]["years_of_experience"] = randint(0, 40)
     return data
 
