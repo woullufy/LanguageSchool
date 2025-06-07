@@ -82,6 +82,9 @@ def course_groups(course_id):
     cursor.execute("SELECT * FROM student_group WHERE course_id = %s", (course_id,))
     groups = cursor.fetchall()
 
+    cursor.execute("SELECT student_id, first_name, last_name FROM student")
+    students = cursor.fetchall()
+
     cursor.close()
     conn.close()
 

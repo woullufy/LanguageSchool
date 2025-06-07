@@ -1,0 +1,27 @@
+[
+  {
+    "course_id": "c1",
+    "language": "English",
+    "title": "Academic English",
+    "level": "C1",
+    "tutor": "t1",
+    "student_group": [
+      {
+        "student_group_id": "g1",
+        "age_category": "Adult",
+        "max_participant": 8,
+        "students": [
+          "s1", "s2", "s3"
+        ]
+      },
+      {
+        "student_group_id": "g2",
+        "age_category": "Teenager",
+        "max_participant": 5,
+        "students": [
+          "s5", "s6", "s7"
+        ]
+      }
+    ]
+  }
+]

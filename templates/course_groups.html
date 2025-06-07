@@ -1,13 +1,45 @@
-<h1>Groups for this Course</h1>
-<ul>
-    {% for group in groups %}
-    <li>
-        <strong>{{ group.student_group_id }}</strong>
-        <p>Age category: {{ group.age_category}}</p>
-        <p>Max members: {{ group.max_participants }}</p>
-        <p>Amount of members: {{ group.max_participants }}</p>
-    </li>
-    {% endfor %}
-</ul>
+<head>
+    <title>Groups for this Course</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 
-<a href="/select-course">← Back to Courses</a>
+<body>
+
+<h2>👥 Groups {{ title }}</h2>
+
+<form action="/select-course" method="get">
+    <button type="submit" class="submit-button">← Back to Courses</button>
+</form>
+
+<table class="styled-table">
+    <thead>
+    <tr>
+        <th>Group ID</th>
+        <th>Age Category</th>
+        <th>Max Participants</th>
+        <th>Current Members</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for group in groups %}
+    <tr>
+        <td>{{ group.student_group_id }}</td>
+        <td>{{ group.age_category }}</td>
+        <td>{{ group.max_participants }}</td>
+        <td>{{ group.amount_of_participants }}</td>
+        <td>
+            <form method="POST" action="/join-group">
+                <input type="hidden" name="student_group_id" value="{{ group.student_group_id }}">
+                <input type="hidden" name="course_id" value="{{ group.course_id }}">
+                <input type="hidden" name="student_id" value="{{ student_id }}">
+                <button type="submit" class="submit-button">➕ Join</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+</body>
+
