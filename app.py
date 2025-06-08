@@ -1,51 +1,31 @@
 from flask import (
     Flask,
-    Blueprint,
     render_template,
     request,
     redirect,
     url_for,
 )
-import mysql.connector
-import subprocess
-import traceback
+from db_connections import get_mysql_connection
+from migrate_all import run_full_migration
+
 from datetime import datetime
-#from pymongo import MongoClient
+import subprocess
 
 app = Flask(__name__)
-
-# def get_connection():
-#     return mysql.connector.connect(
-#         host="mariadb",                 # <- service name from docker-compose
-#         user="root",
-#         password="rootpass",
-#         database="language_school"
-#     )
-
-
-def get_connection():
-    return mysql.connector.connect(
-        host="mariadb",
-        user="flaskuser",
-        password="flaskpass",
-        database="language_school",
-    )
 
 
 @app.route("/generate-data")
 def generate_data():
     try:
-        # Run data_generator.py using subprocess
         subprocess.run(["python", "data_generator.py"], check=True)
         return redirect("/tables")
     except subprocess.CalledProcessError as e:
         return "Error generating data", 500
 
-#@app.rout("/migrate-to-nosql")
 
 @app.route("/tables")
 def show_tables():
-    conn = get_connection()
+    conn = get_mysql_connection()
     cursor = conn.cursor()
 
     # Get all table names
@@ -64,9 +44,10 @@ def show_tables():
     conn.close()
     return render_template("tables.html", data=data)
 
+
 @app.route('/select-course/<student_id>', methods=["GET", "POST"])
 def select_course(student_id):
-    conn = get_connection()
+    conn = get_mysql_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM course")
     courses = cursor.fetchall()
@@ -77,12 +58,12 @@ def select_course(student_id):
         student_id = request.form["student_id"]
         return redirect(url_for('course_groups', course_id=course_id, student_id=student_id))
 
-    return render_template('select_course.html', courses=courses, student_id= student_id)
+    return render_template('select_course.html', courses=courses, student_id=student_id)
 
 
 @app.route("/select-student", methods=["GET", "POST"])
 def select_student():
-    conn = get_connection()
+    conn = get_mysql_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT student_id, first_name, last_name FROM student")
     students = cursor.fetchall()
@@ -97,7 +78,7 @@ def select_student():
 
 @app.route("/course-groups/<course_id>/<student_id>", methods=["GET", "POST"])
 def course_groups(course_id, student_id):
-    conn = get_connection()
+    conn = get_mysql_connection()
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute("SELECT * FROM student_group WHERE course_id = %s", (course_id,))
@@ -111,9 +92,10 @@ def course_groups(course_id, student_id):
 
     return render_template('course_groups.html', groups=groups, title=title, student_id=student_id)
 
+
 @app.route("/join-group/", methods=["POST"])
 def join_group():
-    conn = get_connection()
+    conn = get_mysql_connection()
     cursor = conn.cursor(dictionary=True)
     course_id = request.form["course_id"]
     student_group_id = request.form["student_group_id"]
@@ -129,11 +111,9 @@ def join_group():
     return redirect(url_for("course_groups", course_id=course_id, student_id=student_id))
 
 
-
-
 @app.route("/submit-assignment", methods=["GET", "POST"])
 def submit_assignment_select_student():
-    conn = get_connection()
+    conn = get_mysql_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT student_id, first_name, last_name FROM student")
     students = cursor.fetchall()
@@ -148,43 +128,53 @@ def submit_assignment_select_student():
 
 @app.route("/submit-assignment/<student_id>", methods=["GET", "POST"])
 def submit_assignment_for_student(student_id):
-    conn = get_connection()
+    conn = get_mysql_connection()
     cursor = conn.cursor(dictionary=True)
 
     if request.method == "POST":
         assignment_id = request.form["assignment_id"]
         submission_date = datetime.now()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE assignment
             SET submission_date = %s
             WHERE assignment_id = %s AND from_student = %s
-        """, (submission_date, assignment_id, student_id))
+        """,
+            (submission_date, assignment_id, student_id),
+        )
         conn.commit()
 
     # Load student name and all assignments
-    cursor.execute("SELECT first_name, last_name FROM student WHERE student_id = %s", (student_id,))
+    cursor.execute(
+        "SELECT first_name, last_name FROM student WHERE student_id = %s", (student_id,)
+    )
     student = cursor.fetchone()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT assignment_id, date_due, submission_date
         FROM assignment
         WHERE from_student = %s
-    """, (student_id,))
+    """,
+        (student_id,),
+    )
     assignments = cursor.fetchall()
 
     conn.close()
 
-    return render_template("submit_assignment.html",
-                           student_name=f"{student['first_name']} {student['last_name']}",
-                           student_id=student_id,
-                           assignments=assignments,
-                           now=datetime.now())
+    return render_template(
+        "submit_assignment.html",
+        student_name=f"{student['first_name']} {student['last_name']}",
+        student_id=student_id,
+        assignments=assignments,
+        now=datetime.now(),
+    )
 
 
 @app.route("/grade-assignment", methods=["GET", "POST"])
 def select_mentor():
-    conn = get_connection()
+    conn = get_mysql_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT mentor_id FROM mentor")
     mentors = cursor.fetchall()
@@ -199,7 +189,7 @@ def select_mentor():
 
 @app.route("/grade-assignment/<mentor_id>", methods=["GET", "POST"])
 def grade_assignment(mentor_id):
-    conn = get_connection()
+    conn = get_mysql_connection()
     cursor = conn.cursor(dictionary=True)
 
     # Get students supervised by this mentor
@@ -249,6 +239,12 @@ def grade_assignment(mentor_id):
     )
 
 
+@app.route("/migrate", methods=["GET"])
+def migrate_all():
+    run_full_migration()
+    return redirect(url_for("index"))
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -256,7 +252,7 @@ def index():
 
 if __name__ == "__main__":
     # Ilia's docker settings
-    # app.run(host='0.0.0.0', port = 5050, debug=True)
-     app.run(host= '0.0.0.0', port = 5000, debug=True)
+    app.run(host="0.0.0.0", port=5050, debug=True)
+
     # Local host settings
-    #app.run(debug=True)
+    # app.run(debug=True)

@@ -77,6 +77,5 @@ create table group_membership(
     foreign key (student_group_id, course_id) references student_group(student_group_id, course_id) on delete cascade
 );
 
-
 commit;
 

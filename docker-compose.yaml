@@ -3,11 +3,12 @@ services:
     build: .
     command: python -u app.py
     ports:
-      - "5000:5000"
+      - "5050:5050"
     volumes:
       - .:/app
     depends_on:
       - mariadb
+      - mongodb
 
   mariadb:
     image: mariadb:11
@@ -21,4 +22,12 @@ services:
       - "3306:3306"
     volumes:
       - ./createtable.sql:/docker-entrypoint-initdb.d/createtable.sql
+
+  mongodb:
+    image: mongo:7
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo-data:/data/db
  
