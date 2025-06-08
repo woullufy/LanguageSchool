@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Average Age Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<h1>Average Age Report</h1>
+<form action="/" method="get">
+    <button type="submit" class="submit-button">← Back to Courses</button>
+</form>
+<table class="styled-table">
+    <tr>
+        <th>Title</th>
+        <th>Language</th>
+        <th>Level</th>
+        <th>Average Age</th>
+        <th>Number of Students</th>
+    </tr>
+    {% for report in reports %}
+    <tr>
+        <td>{{ report.title }}</td>
+        <td>{{ report.language }}</td>
+        <td>{{ report.level }}</td>
+        <td>{{ report.average_student_age }}</td>
+        <td>{{ report.number_of_students }}</td>
+    </tr>
+    {% endfor %}
+</table>
+</body>
+</html>

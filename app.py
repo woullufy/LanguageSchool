@@ -141,10 +141,29 @@ def join_group():
 def check_age(age_category, age):
     if age_category == "Adult":
         return age >= 18
-    if age_category == "Teenage":
-        return 11 > age < 18
+    if age_category == "Teenager":
+        return 11 < age < 18
     if age_category == "Kids":
         return age <= 11
+
+@app.route("/average-age-report")
+def average_age_report():
+    conn = get_mysql_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(
+        """
+        select c.title, c.language, c.level,
+        round(avg(s.age)) as average_student_age, count(sg.amount_of_participants) as number_of_students
+        from group_membership gm
+        join student s ON gm.student_id = s.student_id
+        join student_group sg ON gm.student_group_id = sg.student_group_id AND gm.course_id = sg.course_id
+        join course c ON sg.course_id = c.course_id
+        group by c.title, c.language, c.level
+        """
+    )
+    reports = cursor.fetchall()
+    return render_template("average_age_report.html", reports=reports)
+
 
 
 @app.route("/submit-assignment", methods=["GET", "POST"])
