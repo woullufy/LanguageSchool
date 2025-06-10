@@ -1,16 +1,10 @@
-from flask import (
-    Flask,
-    render_template,
-    request,
-    redirect,
-    url_for,
-)
-from db_connections import get_mysql_connection
-from migrate_all import run_full_migration
-
 from datetime import datetime
 import subprocess
 
+from flask import Flask, render_template, redirect, url_for, request
+
+from db_connections import get_mysql_connection
+from migrate_all import run_full_migration
 
 app = Flask(__name__)
 
@@ -74,6 +68,7 @@ def course_groups(course_id):
     return render_template("course_groups.html", groups=groups)
 
 
+# ─── Assignment Submission ───────────────────────────────
 @app.route("/submit-assignment", methods=["GET", "POST"])
 def submit_assignment_select_student():
     conn = get_mysql_connection()
@@ -135,6 +130,7 @@ def submit_assignment_for_student(student_id):
     )
 
 
+# ─── Assignment Grading ───────────────────────────────
 @app.route("/grade-assignment", methods=["GET", "POST"])
 def select_mentor():
     conn = get_mysql_connection()
