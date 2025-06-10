@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from db_connections import get_mysql_connection
+
+from db_connections import get_mysql_connection, get_mongo_connection
 from migrate_all import run_full_migration
 
 from datetime import datetime
@@ -163,12 +164,13 @@ def check_age(age_category, age):
     if age_category == "Kids":
         return age <= 11
 
+
 ##### Reports Start ##################################################
 # ─── Students Assignment's Grades ───────────────────────────────
 @app.route("/graded-report", methods=["GET", "POST"])
 def graded_report():
     threshold = 70
-    mode = "above"  # default filter
+    mode = "above"
 
     if request.method == "POST":
         try:
@@ -205,10 +207,38 @@ def graded_report():
     """
     cursor.execute(query, (threshold,))
     results = cursor.fetchall()
-
     conn.close()
 
-    return render_template("graded_report.html", results=results, threshold=threshold, mode=mode)
+    return render_template(
+        "graded_report.html", results=results, threshold=threshold, mode=mode
+    )
+
+
+@app.route("/nosql-high-performers")
+def nosql_high_performers():
+    threshold = 70
+    db = get_mongo_connection()
+    students = db["students"]
+
+    pipeline = [
+        {"$unwind": "$assignments"},
+        {"$match": {"assignments.evaluation.grade": {"$gte": threshold}}},
+        {
+            "$project": {
+                "student_id": 1,
+                "first_name": 1,
+                "last_name": 1,
+                "assignment_id": "$assignments.assignment_id",
+                "grade": "$assignments.evaluation.grade",
+                "checked_date": "$assignments.evaluation.checked_date",
+            }
+        },
+        {"$sort": {"grade": -1}},
+    ]
+
+    results = list(students.aggregate(pipeline))
+
+    return render_template("nosql_report.html", results=results, threshold=70)
 
 
 # ─── Average Group Age ───────────────────────────────
@@ -230,7 +260,9 @@ def average_age_report():
     reports = cursor.fetchall()
     return render_template("average_age_report.html", reports=reports)
 
+
 ##### Reports End ####################################################
+
 
 # ─── Assignment Submission ───────────────────────────────
 @app.route("/submit-assignment", methods=["GET", "POST"])

@@ -1,4 +1,0 @@
-mysql-connector-python
-Flask
-Faker
-pymongo

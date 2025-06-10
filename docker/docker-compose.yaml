@@ -1,11 +1,16 @@
+version: "3.9"
+
 services:
   flask:
-    build: .
-    command: python -u app.py
+    build: 
+      context: ..
+      dockerfile: docker/Dockerfile
     ports:
       - "5050:5050"
     volumes:
-      - .:/app
+      - ../:/app
+    working_dir: /app
+    command: python -u app.py
     depends_on:
       - mariadb
       - mongodb

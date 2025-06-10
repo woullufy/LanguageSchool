@@ -8,10 +8,11 @@
 
 <body>
 
-    <h1>Welcome to the Language School Platform</h1>
+    <h1>📚 Language School Platform</h1>
+    <p>Select your role below to begin:</p>
 
     <div class="dashboard">
-        <!-- Student -->
+        <!-- Student Section -->
         <div class="role-card">
             <h2>🎓 Student</h2>
             <form action="/submit-assignment" method="get">
@@ -22,48 +23,44 @@
             </form>
         </div>
 
-        <!-- Mentor -->
+        <!-- Mentor Section -->
         <div class="role-card">
             <h2>🧑‍🏫 Mentor</h2>
             <form action="/grade-assignment" method="get">
-                <button type="submit">Grade Assignment</button>
+                <button type="submit">Grade Assignments</button>
             </form>
         </div>
 
-        <!-- Tutor -->
+        <!-- Tutor Section -->
         <div class="role-card">
             <h2>🗣️ Tutor</h2>
             <p>No tutor-specific features yet.</p>
         </div>
 
-        <!-- Developer -->
+        <!-- Developer Section -->
         <div class="role-card">
-            <h2>👩‍💻 Developer</h2>
+            <h2>👩‍💻 Developer Tools</h2>
             <form action="/generate-data" method="get">
-                <button type="submit">Generate Fake Data</button>
+                <button type="submit">🔄 Generate Fake Data</button>
             </form>
             <form action="/tables" method="get">
-                <button type="submit">View All Tables</button>
+                <button type="submit">📋 View All Tables</button>
             </form>
-            <form action="/submit-assignment" method="get">
-                <button type="submit">Test Submit Assignment</button>
+            <form action="/migrate" method="get">
+                <button type="submit">⬇️ Migrate to MongoDB</button>
             </form>
-            <form action="/grade-assignment" method="get">
-                <button type="submit">Test Grade Assignment</button>
+            <hr>
+            <form action="/average-age-report" method="get">
+                <button type="submit">📊 Avg. Age Report (SQL)</button>
+            </form>
+            <form action="/graded-report" method="get">
+                <button type="submit">📈 Graded Report (SQL)</button>
+            </form>
+            <form action="/nosql-high-performers" method="get">
+                <button type="submit">📊 High Performers (NoSQL)</button>
             </form>
         </div>
     </div>
-
-    <form action="/migrate" method="get">
-        <button type="submit">Migrate to NoSQL</button>
-    </form>
-    <form action="/average-age-report" method="get">
-        <button type="submit">See average age report</button>
-    </form>
-    <form action="/graded-report" method="get">
-        <button type="submit">📈 Graded Assignment Report</button>
-    </form>
-
 
 </body>
 

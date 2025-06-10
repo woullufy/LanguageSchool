@@ -4,7 +4,7 @@ from pymongo import MongoClient
 
 def get_mysql_connection():
     return mysql.connector.connect(
-        host="localhost",
+        host="mariadb",
         user="flaskuser",
         password="flaskpass",
         database="language_school",
