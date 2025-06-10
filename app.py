@@ -1,11 +1,4 @@
-from flask import (
-    Flask,
-    render_template,
-    request,
-    redirect,
-    url_for,
-    flash
-)
+from flask import Flask, render_template, request, redirect, url_for, flash
 from db_connections import get_mysql_connection
 from migrate_all import run_full_migration
 
@@ -13,7 +6,7 @@ from datetime import datetime
 import subprocess
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey123'
+app.secret_key = "supersecretkey123"
 
 
 @app.route("/generate-data")
@@ -47,7 +40,7 @@ def show_tables():
     return render_template("tables.html", data=data)
 
 
-@app.route('/select-course/<student_id>', methods=["GET", "POST"])
+@app.route("/select-course/<student_id>", methods=["GET", "POST"])
 def select_course(student_id):
     conn = get_mysql_connection()
     cursor = conn.cursor(dictionary=True)
@@ -58,9 +51,11 @@ def select_course(student_id):
     if request.method == "POST":
         course_id = request.form["course_id"]
         student_id = request.form["student_id"]
-        return redirect(url_for('course_groups', course_id=course_id, student_id=student_id))
+        return redirect(
+            url_for("course_groups", course_id=course_id, student_id=student_id)
+        )
 
-    return render_template('select_course.html', courses=courses, student_id=student_id)
+    return render_template("select_course.html", courses=courses, student_id=student_id)
 
 
 @app.route("/select-student", methods=["GET", "POST"])
@@ -90,15 +85,23 @@ def course_groups(course_id, student_id):
     title_dictionary = cursor.fetchone()
     title = title_dictionary["title"]
 
-    cursor.execute("SELECT student_group_id FROM group_membership WHERE student_id = %s", (student_id,))
+    cursor.execute(
+        "SELECT student_group_id FROM group_membership WHERE student_id = %s",
+        (student_id,),
+    )
     joined_group_rows = cursor.fetchall()
     joined_ids = [row["student_group_id"] for row in joined_group_rows]
 
     cursor.close()
     conn.close()
 
-    return render_template('course_groups.html',
-                           groups=groups, title=title, student_id=student_id, joined_ids=joined_ids)
+    return render_template(
+        "course_groups.html",
+        groups=groups,
+        title=title,
+        student_id=student_id,
+        joined_ids=joined_ids,
+    )
 
 
 @app.route("/join-group/", methods=["POST"])
@@ -109,7 +112,9 @@ def join_group():
     student_group_id = request.form["student_group_id"]
     student_id = request.form["student_id"]
 
-    cursor.execute("SELECT * FROM student_group WHERE student_group_id = %s", (student_group_id,))
+    cursor.execute(
+        "SELECT * FROM student_group WHERE student_group_id = %s", (student_group_id,)
+    )
     group_data = cursor.fetchone()
     age_category = group_data["age_category"]
     amount_of_participants = group_data["amount_of_participants"]
@@ -117,25 +122,37 @@ def join_group():
 
     if amount_of_participants >= max_participants:
         flash("❌ Cannot join: group is full.")
-        return redirect(url_for("course_groups", course_id=course_id, student_id=student_id))
+        return redirect(
+            url_for("course_groups", course_id=course_id, student_id=student_id)
+        )
 
     cursor.execute("SELECT age FROM student WHERE student_id = %s", (student_id,))
     student_data = cursor.fetchone()
     student_age = student_data["age"]
     if not check_age(age_category, student_age):
         flash("❌ Cannot join: it is not you age category.")
-        return redirect(url_for("course_groups", course_id=course_id, student_id=student_id))
+        return redirect(
+            url_for("course_groups", course_id=course_id, student_id=student_id)
+        )
 
-    cursor.execute("INSERT INTO group_membership (student_id, student_group_id, course_id)"
-                   " VALUES (%s, %s, %s)", (student_id, student_group_id, course_id))
+    cursor.execute(
+        "INSERT INTO group_membership (student_id, student_group_id, course_id)"
+        " VALUES (%s, %s, %s)",
+        (student_id, student_group_id, course_id),
+    )
 
-    cursor.execute("UPDATE student_group SET amount_of_participants = amount_of_participants + 1 "
-                   "WHERE student_group_id = %s", (student_group_id,))
+    cursor.execute(
+        "UPDATE student_group SET amount_of_participants = amount_of_participants + 1 "
+        "WHERE student_group_id = %s",
+        (student_group_id,),
+    )
 
     conn.commit()
     conn.close()
 
-    return redirect(url_for("course_groups", course_id=course_id, student_id=student_id))
+    return redirect(
+        url_for("course_groups", course_id=course_id, student_id=student_id)
+    )
 
 
 def check_age(age_category, age):
@@ -146,6 +163,55 @@ def check_age(age_category, age):
     if age_category == "Kids":
         return age <= 11
 
+##### Reports Start ##################################################
+# ─── Students Assignment's Grades ───────────────────────────────
+@app.route("/graded-report", methods=["GET", "POST"])
+def graded_report():
+    threshold = 70
+    mode = "above"  # default filter
+
+    if request.method == "POST":
+        try:
+            threshold = int(request.form["threshold"])
+            mode = request.form.get("mode", "above")
+        except ValueError:
+            pass
+
+    conn = get_mysql_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    comparator = ">=" if mode == "above" else "<"
+    query = f"""
+    SELECT 
+        ca.assignment_id,
+        ca.grade,
+        ca.checked_date,
+        m.mentor_id,
+        e.first_name AS mentor_first_name,
+        e.last_name AS mentor_last_name,
+        s.student_id,
+        s.first_name AS student_first_name,
+        s.last_name AS student_last_name,
+        a.submission_date,
+        a.date_due,
+        a.date_issued
+    FROM checked_assignments ca
+    JOIN mentor m ON ca.mentor_id = m.mentor_id
+    JOIN employee e ON m.mentor_id = e.employee_id
+    JOIN assignment a ON ca.assignment_id = a.assignment_id
+    JOIN student s ON a.from_student = s.student_id
+    WHERE ca.grade {comparator} %s
+    ORDER BY ca.grade DESC
+    """
+    cursor.execute(query, (threshold,))
+    results = cursor.fetchall()
+
+    conn.close()
+
+    return render_template("graded_report.html", results=results, threshold=threshold, mode=mode)
+
+
+# ─── Average Group Age ───────────────────────────────
 @app.route("/average-age-report")
 def average_age_report():
     conn = get_mysql_connection()
@@ -164,7 +230,7 @@ def average_age_report():
     reports = cursor.fetchall()
     return render_template("average_age_report.html", reports=reports)
 
-
+##### Reports End ####################################################
 
 # ─── Assignment Submission ───────────────────────────────
 @app.route("/submit-assignment", methods=["GET", "POST"])

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Graded Assignment Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <h1>Graded Assignment Report (≥ {{ threshold }})</h1>
+
+    <form action="/" method="get">
+        <button type="submit" class="submit-button">← Back to Main Page</button>
+    </form>
+    <form method="POST">
+        <label for="threshold">Grade Threshold:</label>
+        <input type="number" name="threshold" value="{{ threshold }}" min="0" max="100">
+
+        <label>
+            <input type="radio" name="mode" value="above" {% if mode=="above" %}checked{% endif %}>
+            Show assignments >= threshold
+        </label>
+        <label>
+            <input type="radio" name="mode" value="below" {% if mode=="below" %}checked{% endif %}>
+            Show assignments < threshold </label>
+
+                <button type="submit" class="submit-button">Apply Filter</button>
+    </form>
+
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Assignment ID</th>
+                <th>Grade</th>
+                <th>Student</th>
+                <th>Submission Date</th>
+                <th>Due Date</th>
+                <th>Mentor</th>
+                <th>Graded On</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in results %}
+            <tr>
+                <td>{{ row.assignment_id }}</td>
+                <td>{{ row.grade }}</td>
+                <td>{{ row.student_first_name }} {{ row.student_last_name }}</td>
+                <td>{{ row.submission_date }}</td>
+                <td>{{ row.date_due }}</td>
+                <td>{{ row.mentor_first_name }} {{ row.mentor_last_name }}</td>
+                <td>{{ row.checked_date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+
+</html>
