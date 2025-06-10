@@ -227,6 +227,6 @@ insert_sample_data(connection, "course", course_data)
 group_data = generate_data_group(20, faker, course_data)
 insert_sample_data(connection, "student_group", group_data)
 
-assigment_data = generate_data_assigment(40, faker, student_data)
+assigment_data = generate_data_assigment(70, faker, student_data)
 insert_sample_data(connection, "assignment", assigment_data)
 connection.close()

@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for
-from db_connections import get_mysql_connection
+from db_connections import get_mysql_connection, get_mongo_connection
 from migration.migrate_all import run_full_migration
 import subprocess
 
@@ -39,6 +39,22 @@ def show_tables():
 def migrate_all_route():
     run_full_migration()
     return redirect(url_for("main.index"))
+
+
+@main_bp.route("/tables_mongo_courses")
+def show_tables_courses():
+    db = get_mongo_connection()
+    courses_collection = db["courses"]
+    courses = list(courses_collection.find({}))
+    return render_template("courses_mongo.html", courses=courses)
+
+
+@main_bp.route("/tables_mongo_students")
+def show_tables_students():
+    db = get_mongo_connection()
+    students_collection = db["students"]
+    students = list(students_collection.find({}))
+    return render_template("students_mongo.html", students=students)
 
 
 @main_bp.route("/")

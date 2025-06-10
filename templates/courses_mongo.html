@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Available Courses</title>
+</head>
+<body>
+    {%for course in courses%}
+    <div class="course">
+        <h2>{{ course.title }} ({{ course.level }})</h2>
+        <p>Language: {{ course.language }}</p>
+        <p>Tutor: {{course.tutor}}</p>
+
+        <div class="groups">
+            {% for group in course.student_group %}
+            <div class="group">
+                <h3>Group {{ group.student_group_id }}</h3>
+                <p>Age: {{ group.age_category }}</p>
+                <p>Students: {{ group.students|join(', ') }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</body>
+</html>
