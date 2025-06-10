@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Available Employees</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+    <h1>Our Employees</h1>
+    {% for employee in employees %}
+    <div class="employee-card">
+        <h2>{{ employee.first_name }} {{ employee.last_name }}</h2>
+        <p class="role">Role: {{ employee.role | capitalize }}</p> {# Capitalize role for nicer display #}
+
+        {% if employee.role == 'mentor' %}
+        <p>Experience Level: {{ employee.xp_level }}</p>
+        <p>Students Supervised: {{ employee.amount_of_students }}</p>
+        {% if employee.supervise %}
+        <p>Supervises: {{ employee.supervise }}</p>
+        {% endif %}
+        {% elif employee.role == 'tutor' %}
+        <p>Years of Experience: {{ employee.years_of_experiece }}</p>
+        <p class="speciality">Language Speciality: {{ employee.language_speciality }}</p>
+        {% else %}
+        <p>Additional details for {{ employee.role }} not specified.</p>
+        {% endif %}
+    </div>
+    {% else %} {# This block executes if 'employees' list is empty #}
+    <p>No employee data available to display.</p>
+    {% endfor %}
+</body>
+
+</html>

@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Available Courses</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 </head>
+
 <body>
     {%for course in courses%}
     <div class="course">
@@ -23,4 +27,5 @@
     </div>
     {% endfor %}
 </body>
+
 </html>

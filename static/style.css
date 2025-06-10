@@ -2,12 +2,24 @@ body {
     font-family: 'Segoe UI', sans-serif;
     padding: 40px;
     background-color: #f9f9f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 10px;
 }
 
 h2 {
     text-align: center;
     margin-bottom: 30px;
 }
+
 
 .styled-table {
     width: 100%;
@@ -101,6 +113,7 @@ h1 {
 .role-card h2 {
     margin-top: 0;
     font-size: 1.4em;
+    text-align: center;
 }
 
 .role-card form {
@@ -119,4 +132,124 @@ h1 {
 
 .role-card button:hover {
     background-color: #0056b3;
+}
+
+
+.course,
+.student,
+.employee-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e6ed;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.course:hover,
+.student:hover,
+.employee-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.course h2,
+.student h2,
+.employee-card h2 {
+    text-align: left;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+.course h2 {
+    color: #3498db;
+}
+
+.student h2 {
+    color: #e67e22;
+}
+
+.employee-card h2 {
+    color: #27ae60;
+}
+
+.course p,
+.student p,
+.employee-card p {
+    font-size: 1em;
+    color: #555;
+    margin: 8px 0;
+}
+
+.groups,
+.assignments {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px dashed #ced4da;
+}
+
+.group,
+.assignment,
+.evaluation {
+    background-color: #fcfdfe;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.04);
+}
+
+.group h3 {
+    color: #16a085;
+}
+
+.assignment h3 {
+    color: #c0392b;
+}
+
+.group p,
+.assignment p {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.evaluation {
+    background-color: #ffeebb;
+    border-left: 5px solid #f39c12;
+    padding: 12px;
+    margin-top: 15px;
+    border-radius: 6px;
+}
+
+.evaluation h4 {
+    color: #d35400;
+    margin-bottom: 8px;
+}
+
+.evaluation p {
+    font-size: 0.88em;
+    color: #777;
+}
+
+.employee-card .role {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.employee-card .speciality {
+    font-style: italic;
+    color: #28a745;
+}
+
+.no-data-message {
+    text-align: center;
+    font-style: italic;
+    color: #7f8c8d;
+    padding: 30px;
+    border: 1px dashed #bdc3c7;
+    border-radius: 8px;
+    background-color: #ecf0f1;
+    margin-top: 50px;
 }

@@ -58,6 +58,14 @@ def show_tables_students():
     return render_template("students_mongo.html", students=students)
 
 
+@main_bp.route("/tables_mongo_employees")
+def show_tables_empoloyees():
+    db = get_mongo_connection()
+    employees_collection = db["employees"]
+    employees = list(employees_collection.find({}))
+    return render_template("employees_mongo.html", employees=employees)
+
+
 @main_bp.route("/")
 def index():
     return render_template("index.html")
