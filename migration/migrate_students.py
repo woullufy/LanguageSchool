@@ -48,7 +48,6 @@ def migrate_students():
                 ),
             }
 
-
             if a["assignment_id"] in checked:
                 g = checked[a["assignment_id"]]
                 assignment_doc["evaluation"] = {

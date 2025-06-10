@@ -1,7 +1,6 @@
 # RUN pip install mysql-connector-python for docker
 from db_connections import get_mysql_connection
 from datetime import date
-import mysql.connector
 from mysql.connector import Error
 from faker import Faker
 
