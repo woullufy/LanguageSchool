@@ -8,3 +8,4 @@ __pycache__/
 # OS and editor system files
 .DS_Store
 Thumbs.db
+docker/mongo-data

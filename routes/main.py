@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, redirect, url_for
-from db_connections import get_mysql_connection
+from flask import Blueprint, render_template, redirect, url_for, flash
+from db_connections import get_mysql_connection, get_mongo_connection
 from migration.migrate_all import run_full_migration
 import subprocess
 
@@ -7,6 +7,7 @@ main_bp = Blueprint("main", __name__)
 
 
 @main_bp.route("/generate-data")
+
 def generate_data():
     try:
         subprocess.run(["python", "data_generator.py"], check=True)
@@ -44,3 +45,5 @@ def migrate_all_route():
 @main_bp.route("/")
 def index():
     return render_template("index.html")
+
+
