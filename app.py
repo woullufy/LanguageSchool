@@ -1,17 +1,20 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 
 from db_connections import get_mysql_connection, get_mongo_connection
-from migrate_all import run_full_migration
+from migration.migrate_all import run_full_migration
 
 from datetime import datetime
 import subprocess
 
 from routes.reports import reports_bp
+from routes.assignments import assignments_bp
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey123"
 
 app.register_blueprint(reports_bp)
+app.register_blueprint(assignments_bp)
+
 
 @app.route("/generate-data")
 def generate_data():
@@ -168,84 +171,6 @@ def check_age(age_category, age):
         return age <= 11
 
 
-# ─── Assignment Submission ───────────────────────────────
-@app.route("/submit-assignment", methods=["GET", "POST"])
-def submit_assignment_select_student():
-    conn = get_mysql_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT student_id, first_name, last_name FROM student")
-    students = cursor.fetchall()
-    conn.close()
-
-    if request.method == "POST":
-        student_id = request.form["student_id"]
-        return redirect(url_for("submit_assignment_for_student", student_id=student_id))
-
-    return render_template("select_student.html", students=students)
-
-
-@app.route("/submit-assignment/<student_id>", methods=["GET", "POST"])
-def submit_assignment_for_student(student_id):
-    conn = get_mysql_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    if request.method == "POST":
-        assignment_id = request.form["assignment_id"]
-        submission_date = datetime.now()
-
-        cursor.execute(
-            """
-            UPDATE assignment
-            SET submission_date = %s
-            WHERE assignment_id = %s AND from_student = %s
-        """,
-            (submission_date, assignment_id, student_id),
-        )
-        conn.commit()
-
-    # Load student name and all assignments
-    cursor.execute(
-        "SELECT first_name, last_name FROM student WHERE student_id = %s", (student_id,)
-    )
-    student = cursor.fetchone()
-
-    cursor.execute(
-        """
-        SELECT assignment_id, date_due, submission_date
-        FROM assignment
-        WHERE from_student = %s
-    """,
-        (student_id,),
-    )
-    assignments = cursor.fetchall()
-
-    conn.close()
-
-    return render_template(
-        "submit_assignment.html",
-        student_name=f"{student['first_name']} {student['last_name']}",
-        student_id=student_id,
-        assignments=assignments,
-        now=datetime.now(),
-    )
-
-
-# ─── Assignment Grading ───────────────────────────────
-@app.route("/grade-assignment", methods=["GET", "POST"])
-def select_mentor():
-    conn = get_mysql_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT mentor_id FROM mentor")
-    mentors = cursor.fetchall()
-    conn.close()
-
-    if request.method == "POST":
-        mentor_id = request.form["mentor_id"]
-        return redirect(url_for("grade_assignment", mentor_id=mentor_id))
-
-    return render_template("select_mentor.html", mentors=mentors)
-
-
 @app.route("/grade-assignment/<mentor_id>", methods=["GET", "POST"])
 def grade_assignment(mentor_id):
     conn = get_mysql_connection()
@@ -310,8 +235,5 @@ def index():
 
 
 if __name__ == "__main__":
-    # Ilia's docker settings
     app.run(host="0.0.0.0", port=5050, debug=True)
-
-    # Local host settings
     # app.run(debug=True)
