@@ -1,50 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 
 from db_connections import get_mysql_connection, get_mongo_connection
-from migration.migrate_all import run_full_migration
-
-from datetime import datetime
-import subprocess
 
 from routes.reports import reports_bp
 from routes.assignments import assignments_bp
+from routes.main import main_bp
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey123"
 
 app.register_blueprint(reports_bp)
 app.register_blueprint(assignments_bp)
-
-
-@app.route("/generate-data")
-def generate_data():
-    try:
-        subprocess.run(["python", "data_generator.py"], check=True)
-        return redirect("/tables")
-    except subprocess.CalledProcessError as e:
-        return "Error generating data", 500
-
-
-@app.route("/tables")
-def show_tables():
-    conn = get_mysql_connection()
-    cursor = conn.cursor()
-
-    # Get all table names
-    cursor.execute("SHOW TABLES")
-    tables = [row[0] for row in cursor.fetchall()]
-
-    # Fetch rows for each table
-    data = {}
-    for table in tables:
-        cursor.execute(f"SELECT * FROM {table}")
-        columns = [col[0] for col in cursor.description]
-        rows = cursor.fetchall()
-        data[table] = {"columns": columns, "rows": rows}
-
-    cursor.close()
-    conn.close()
-    return render_template("tables.html", data=data)
+app.register_blueprint(main_bp)
 
 
 @app.route("/select-course/<student_id>", methods=["GET", "POST"])
@@ -169,69 +136,6 @@ def check_age(age_category, age):
         return 11 < age < 18
     if age_category == "Kids":
         return age <= 11
-
-
-@app.route("/grade-assignment/<mentor_id>", methods=["GET", "POST"])
-def grade_assignment(mentor_id):
-    conn = get_mysql_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    # Get students supervised by this mentor
-    cursor.execute(
-        """
-        SELECT student_id, first_name, last_name
-        FROM student
-        WHERE mentor = %s
-    """,
-        (mentor_id,),
-    )
-    students = cursor.fetchall()
-
-    # Get assignments from those students that have been submitted
-    cursor.execute(
-        """
-        SELECT a.assignment_id, a.from_student, s.first_name, s.last_name, a.submission_date
-        FROM assignment a
-        JOIN student s ON a.from_student = s.student_id
-        WHERE s.mentor = %s AND a.submission_date IS NOT NULL
-          AND a.assignment_id NOT IN (SELECT assignment_id FROM checked_assignments)
-    """,
-        (mentor_id,),
-    )
-    assignments = cursor.fetchall()
-
-    if request.method == "POST":
-        assignment_id = request.form["assignment_id"]
-        grade = int(request.form["grade"])
-        checked_date = datetime.now()
-
-        cursor.execute(
-            """
-            INSERT INTO checked_assignments (assignment_id, mentor_id, grade, checked_date)
-            VALUES (%s, %s, %s, %s)
-        """,
-            (assignment_id, mentor_id, grade, checked_date),
-        )
-
-        conn.commit()
-        conn.close()
-        return redirect("/tables")
-
-    conn.close()
-    return render_template(
-        "grade_assignment.html", assignments=assignments, mentor_id=mentor_id
-    )
-
-
-@app.route("/migrate", methods=["GET"])
-def migrate_all():
-    run_full_migration()
-    return redirect(url_for("index"))
-
-
-@app.route("/")
-def index():
-    return render_template("index.html")
 
 
 if __name__ == "__main__":
