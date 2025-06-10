@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Students</title>
+</head>
+<body>
+{% for student in students %}
+<div class="student">
+    <h2>{{ student.first_name }} {{ student.last_name }}</h2>
+    <p>Student ID: {{ student.student_id }}</p>
+    <p>Email: {{ student.email }}</p>
+    <p>Mentor ID: {{ student.mentor_id }}</p>
+
+    <div class="assignments">
+        {% for assignment in student.assignments %}
+        <div class="assignment">
+            <h3>Assignment {{ assignment.assignment_id }}</h3>
+            <p>Date Due: {{ assignment.date_due }}</p>
+            <p>Date Issued: {{ assignment.date_issued }}</p>
+            <p>Submission Date: {{ assignment.submission_date }}</p>
+
+            {% if assignment.evaluation %}
+            <div class="evaluation">
+                <h4>Evaluation</h4>
+                <p>Grade: {{ assignment.evaluation.grade }}</p>
+                <p>Checked Date: {{ assignment.evaluation.checked_date }}</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+</body>
+</html>

@@ -112,7 +112,7 @@ def generate_data_group(x, faker, course_data):
         data[i]["course_id"] = id_course
         data[i]["age_category"] = faker.random_element(age_category)
         data[i]["amount_of_participants"] = 0
-        data[i]["max_participants"] = faker.random_int(5, 15)
+        data[i]["max_participants"] = faker.random_int(3, 10)
     return data
 
 
@@ -139,7 +139,7 @@ def generate_data_student(conn, x, faker, generated_mentor):
         data[i]["first_name"] = faker.first_name()
         data[i]["last_name"] = faker.last_name()
         data[i]["email"] = faker.email()
-        data[i]["age"] = randint(10, 60)
+        data[i]["age"] = randint(5, 60)
         id_mentor = faker.random_element(mentor_ids)
         data[i]["mentor"] = id_mentor
         add_student(conn, id_mentor)
@@ -218,7 +218,7 @@ mentor_data = generate_data_mentor(8, faker)
 insert_sample_data(connection, "employee", mentor_data)
 insert_sample_data(connection, "mentor", mentor_data)
 
-student_data = generate_data_student(connection, 10, faker, mentor_data)
+student_data = generate_data_student(connection, 20, faker, mentor_data)
 insert_sample_data(connection, "student", student_data)
 
 course_data = generate_data_course(connection, 10, faker, tutor_data)
@@ -227,6 +227,6 @@ insert_sample_data(connection, "course", course_data)
 group_data = generate_data_group(20, faker, course_data)
 insert_sample_data(connection, "student_group", group_data)
 
-assigment_data = generate_data_assigment(40, faker, student_data)
+assigment_data = generate_data_assigment(70, faker, student_data)
 insert_sample_data(connection, "assignment", assigment_data)
 connection.close()
