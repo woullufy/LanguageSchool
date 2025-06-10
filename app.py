@@ -6,9 +6,12 @@ from migrate_all import run_full_migration
 from datetime import datetime
 import subprocess
 
+from routes.reports import reports_bp
+
 app = Flask(__name__)
 app.secret_key = "supersecretkey123"
 
+app.register_blueprint(reports_bp)
 
 @app.route("/generate-data")
 def generate_data():
@@ -163,105 +166,6 @@ def check_age(age_category, age):
         return 11 < age < 18
     if age_category == "Kids":
         return age <= 11
-
-
-##### Reports Start ##################################################
-# ─── Students Assignment's Grades ───────────────────────────────
-@app.route("/graded-report", methods=["GET", "POST"])
-def graded_report():
-    threshold = 70
-    mode = "above"
-
-    if request.method == "POST":
-        try:
-            threshold = int(request.form["threshold"])
-            mode = request.form.get("mode", "above")
-        except ValueError:
-            pass
-
-    conn = get_mysql_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    comparator = ">=" if mode == "above" else "<"
-    query = f"""
-    SELECT 
-        ca.assignment_id,
-        ca.grade,
-        ca.checked_date,
-        m.mentor_id,
-        e.first_name AS mentor_first_name,
-        e.last_name AS mentor_last_name,
-        s.student_id,
-        s.first_name AS student_first_name,
-        s.last_name AS student_last_name,
-        a.submission_date,
-        a.date_due,
-        a.date_issued
-    FROM checked_assignments ca
-    JOIN mentor m ON ca.mentor_id = m.mentor_id
-    JOIN employee e ON m.mentor_id = e.employee_id
-    JOIN assignment a ON ca.assignment_id = a.assignment_id
-    JOIN student s ON a.from_student = s.student_id
-    WHERE ca.grade {comparator} %s
-    ORDER BY ca.grade DESC
-    """
-    cursor.execute(query, (threshold,))
-    results = cursor.fetchall()
-    conn.close()
-
-    return render_template(
-        "graded_report.html", results=results, threshold=threshold, mode=mode
-    )
-
-
-@app.route("/nosql-high-performers")
-def nosql_high_performers():
-    threshold = 70
-    db = get_mongo_connection()
-    students = db["students"]
-
-    pipeline = [
-        {"$unwind": "$assignments"},
-        {"$match": {"assignments.evaluation.grade": {"$gte": threshold}}},
-        {
-            "$project": {
-                "student_id": 1,
-                "first_name": 1,
-                "last_name": 1,
-                "assignment_id": "$assignments.assignment_id",
-                "grade": "$assignments.evaluation.grade",
-                "checked_date": "$assignments.evaluation.checked_date",
-            }
-        },
-        {"$sort": {"grade": -1}},
-    ]
-
-    results = list(students.aggregate(pipeline))
-
-    return render_template("nosql_report.html", results=results, threshold=70)
-
-
-# ─── Average Group Age ───────────────────────────────
-@app.route("/average-age-report")
-def average_age_report():
-    conn = get_mysql_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute(
-        """
-        select c.title, c.language, c.level,
-        round(avg(s.age)) as average_student_age, count(sg.amount_of_participants) as number_of_students
-        from group_membership gm
-        join student s ON gm.student_id = s.student_id
-        join student_group sg ON gm.student_group_id = sg.student_group_id AND gm.course_id = sg.course_id
-        join course c ON sg.course_id = c.course_id
-        group by c.title, c.language, c.level
-        """
-    )
-    reports = cursor.fetchall()
-    return render_template("average_age_report.html", reports=reports)
-
-
-##### Reports End ####################################################
 
 
 # ─── Assignment Submission ───────────────────────────────
