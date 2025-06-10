@@ -3,12 +3,12 @@ from pymongo import MongoClient
 
 def get_mysql_connection():
     return mysql.connector.connect(
-        host="localhost",
+        host="mariadb",
         user="flaskuser",
         password="flaskpass",
         database="language_school"
     )
 
 def get_mongo_connection():
-    client = MongoClient("mongodb://localhost:27017/")
+    client = MongoClient("mongodb://mongodb:27017/")
     return client.language_school_nosql

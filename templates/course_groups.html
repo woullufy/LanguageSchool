@@ -5,11 +5,18 @@
 
 <body>
 
-<h2>👥 Groups {{ title }}</h2>
+<h1>👥 Groups for {{ title }}</h1>
 
-<form action="/select-course" method="get">
+<form action="/select-course/{{ student_id }}" method="get">
     <button type="submit" class="submit-button">← Back to Courses</button>
 </form>
+{% with messages = get_flashed_messages()%}
+{% if messages%}
+{% for message in messages%}
+<p>{{message}}</p>
+{%endfor%}
+{%endif%}
+{%endwith%}
 
 <table class="styled-table">
     <thead>
@@ -29,12 +36,18 @@
         <td>{{ group.max_participants }}</td>
         <td>{{ group.amount_of_participants }}</td>
         <td>
-            <form method="POST" action="/join-group">
-                <input type="hidden" name="student_group_id" value="{{ group.student_group_id }}">
-                <input type="hidden" name="course_id" value="{{ group.course_id }}">
-                <input type="hidden" name="student_id" value="{{ student_id }}">
-                <button type="submit" class="submit-button">➕ Join</button>
-            </form>
+            {% if group.student_group_id in joined_ids %}
+            <button type="button" disabled class="done-button">✅ Done</button>
+            {% else %}
+                <form method="POST" action="/join-group">
+                    <input type="hidden" name="student_group_id" value="{{ group.student_group_id }}">
+                    <input type="hidden" name="course_id" value="{{ group.course_id }}">
+                    <input type="hidden" name="student_id" value="{{ student_id }}">
+                    <input type="hidden" name="age_category" value="{{group.age_category}}">
+
+                    <button type="submit" class="submit-button">➕ Join</button>
+                </form>
+            {% endif %}
         </td>
     </tr>
     {% endfor %}
