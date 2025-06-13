@@ -1,8 +1,11 @@
-from flask import Blueprint, render_template, request, redirect, url_for
-from db_connections import get_mysql_connection
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from db_connections import get_mysql_connection, get_mongo_connection
 from datetime import datetime
+from pymongo import ASCENDING, DESCENDING
 
 assignments_bp = Blueprint("assignments", __name__)
+
+#### **SQL Assignment Management**
 
 
 # ─── Assignment Submission ───────────────────────────────
@@ -136,3 +139,85 @@ def grade_assignment(mentor_id):
         "grade_assignment.html", assignments=assignments, mentor_id=mentor_id
     )
 
+
+#### **NoSQL Assignment Management**
+
+
+@assignments_bp.route("/submit_assignment_nosql", methods=["GET", "POST"])
+def submit_assignment_nosql_select_student():
+    db = get_mongo_connection()
+    students_col = db["students"]
+    students = list(
+        students_col.find(
+            {}, {"student_id": 1, "first_name": 1, "last_name": 1, "_id": 0}
+        )
+    )
+
+    if request.method == "POST":
+        student_id = request.form["student_id"]
+        return redirect(
+            url_for(
+                "assignments.submit_assignment_nosql_for_student", student_id=student_id
+            )
+        )
+
+    return render_template("select_student.html", students=students)
+
+
+# # --- Assignment Submission - For Specific Student ---
+@assignments_bp.route("/submit-assignment-nosql/<student_id>", methods=["GET", "POST"])
+def submit_assignment_nosql_for_student(student_id):
+    db = get_mongo_connection()
+    assignments = []
+    current_time = datetime.now()
+    students_col = db["students"]
+
+    if request.method == "POST":
+        assignment_id = request.form["assignment_id"]
+        submission_date_str = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+
+        students_col.update_one(
+            {
+                "student_id": student_id,
+                "assignments.assignment_id": assignment_id,
+            },
+            {"$set": {"assignments.$.submission_date": submission_date_str}},
+        )
+
+        return redirect(
+            url_for(
+                "assignments.submit_assignment_nosql_for_student",
+                student_id=student_id,
+            )
+        )
+
+    student_doc = students_col.find_one({"student_id": student_id})
+
+    if student_doc:
+        for assign in student_doc.get("assignments", []):
+            adapted_assignment = {
+                "assignment_id": assign.get("assignment_id"),
+                "date_due": (
+                    datetime.strptime(assign.get("date_due", ""), "%Y-%m-%dT%H:%M:%S")
+                    if assign.get("date_due")
+                    else None
+                ),
+                "submission_date": (
+                    datetime.strptime(
+                        assign.get("submission_date", ""), "%Y-%m-%dT%H:%M:%S"
+                    )
+                    if assign.get("submission_date")
+                    else None
+                ),
+            }
+            assignments.append(adapted_assignment)
+
+    student_name = f"{student_doc.get('first_name')} {student_doc.get('last_name')}"
+
+    return render_template(
+        "submit_assignment.html",
+        student_name=student_name,
+        student_id=student_id,
+        assignments=assignments,
+        now=current_time,
+    )

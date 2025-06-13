@@ -2,33 +2,36 @@
 <html>
 
 <head>
-    <title>All Tables</title>
+    <title>All Database Tables</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
-    <h1>Database Tables</h1>
+    <h1>Database Tables Overview</h1>
     <form action="/" method="get">
-        <button type="submit" , class="submit-button">Home</button>
+        <button type="submit" class="submit-button">Go to Home</button>
     </form>
 
-
     {% for table, content in data.items() %}
-    <h2>{{ table }}</h2>
-    <table border="1" cellpadding="5">
-        <tr>
-            {% for col in content.columns %}
-            <th>{{ col }}</th>
+    <h2>{{ table | capitalize }}</h2> 
+    <table class="styled-table">
+        <thead>
+            <tr>
+                {% for col in content.columns %}
+                <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in content.rows %}
+            <tr>
+                {% for cell in row %}
+                <td>{{ cell }}</td>
+                {% endfor %}
+            </tr>
             {% endfor %}
-        </tr>
-        {% for row in content.rows %}
-        <tr>
-            {% for cell in row %}
-            <td>{{ cell }}</td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
+        </tbody>
     </table>
-    <br>
     {% endfor %}
 </body>
 
