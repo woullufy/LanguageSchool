@@ -1,0 +1,40 @@
+
+<head>
+    <title>Select Course</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+<h1>Select a Course</h1>
+
+<form action="/" method="get">
+    <button type="submit" class="submit-button">← Back to Courses</button>
+</form>
+
+<table class="styled-table">
+    <thead>
+    <tr>
+        <th>Title</th>
+        <th>Language</th>
+        <th>Level</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for course in courses %}
+    <tr>
+        <td>{{ course.title }}</td>
+        <td>{{ course.language }}</td>
+        <td>{{ course.level }}</td>
+        <td>
+            <form method="POST" action="/select-course-mongo/{{ student_id }}">
+                <input type="hidden" name="course_id" value="{{ course.course_id }}">
+                <input type="hidden" name="title" value="{{ course.title }}">
+                <input type="hidden" name="student_id" value="{{student_id}}">
+                <button type="submit" class="submit-button">Select</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</body>

@@ -1,0 +1,57 @@
+<head>
+    <title>Groups for this Course</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<h1>👥 Groups for {{ title }}</h1>
+
+<form action="/select-course-mongo/{{ student_id }}" method="get">
+    <button type="submit" class="submit-button">← Back to Courses</button>
+</form>
+{% with messages = get_flashed_messages()%}
+{% if messages%}
+{% for message in messages%}
+<p>{{message}}</p>
+{%endfor%}
+{%endif%}
+{%endwith%}
+
+<table class="styled-table">
+    <thead>
+    <tr>
+        <th>Group ID</th>
+        <th>Age Category</th>
+        <th>Max Participants</th>
+        <th>Current Members</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for group in groups %}
+    <tr>
+        <td>{{ group.student_group_id }}</td>
+        <td>{{ group.age_category }}</td>
+        <td>{{ group.max_participant }}</td>
+        <td>{{ group.students | length }}</td>
+        <td>
+            {% if student_id in group.students %}
+            <button type="button" disabled class="done-button">✅ Done</button>
+            {% else %}
+            <form method="POST" action="/join-group-mongo">
+                <input type="hidden" name="student_group_id" value="{{ group.student_group_id }}">
+                <input type="hidden" name="course_id" value="{{ course_id }}">
+                <input type="hidden" name="student_id" value="{{ student_id }}">
+                <input type="hidden" name="age_category" value="{{group.age_category}}">
+
+                <button type="submit" class="submit-button">➕ Join</button>
+            </form>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+</body>

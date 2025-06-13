@@ -59,7 +59,7 @@ def show_tables_students():
 
 
 @main_bp.route("/tables_mongo_employees")
-def show_tables_empoloyees():
+def show_tables_employees():
     db = get_mongo_connection()
     employees_collection = db["employees"]
     employees = list(employees_collection.find({}))

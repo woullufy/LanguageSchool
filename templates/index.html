@@ -12,7 +12,7 @@
     <p>Select your role below to begin:</p>
 
     <div class="dashboard">
-        <!-- Student Section -->
+
         <div class="role-card">
             <h2>🎓 Student</h2>
             <form action="/submit-assignment" method="get">
@@ -21,9 +21,12 @@
             <form action="/select-student" method="get">
                 <button type="submit">Select Group</button>
             </form>
+            <form action="/select-student-mongo" method="get">
+                <button type="submit">Select Group (NoSQL)</button>
+            </form>
         </div>
 
-        <!-- Mentor Section -->
+
         <div class="role-card">
             <h2>🧑‍🏫 Mentor</h2>
             <form action="/grade-assignment" method="get">
@@ -31,13 +34,13 @@
             </form>
         </div>
 
-        <!-- Tutor Section -->
+
         <div class="role-card">
             <h2>🗣️ Tutor</h2>
             <p>No tutor-specific features yet.</p>
         </div>
 
-        <!-- Developer Section -->
+
         <div class="role-card">
             <h2>👩‍💻 Developer Tools</h2>
             <form action="/generate-data" method="get">
