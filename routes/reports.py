@@ -4,7 +4,7 @@ from db_connections import get_mysql_connection, get_mongo_connection
 reports_bp = Blueprint("reports", __name__)
 
 
-# --- Students Assignment's Grades ───────────────────────────────
+# Students Assignment's Grades
 @reports_bp.route("/graded-report", methods=["GET", "POST"])
 def graded_report():
     threshold = 70
@@ -79,7 +79,7 @@ def nosql_high_performers():
     return render_template("nosql_report.html", results=results, threshold=70)
 
 
-# ─── Average Group Age ───────────────────────────────
+# Average Group Age
 @reports_bp.route("/average-age-report")
 def average_age_report():
     conn = get_mysql_connection()
@@ -98,4 +98,43 @@ def average_age_report():
     reports = cursor.fetchall()
     return render_template("average_age_report.html", reports=reports)
 
+@reports_bp.route("/avg-age-report-nosql")
+def avg_age_report_nosql():
+    db = get_mongo_connection()
+    pipeline = [
+        {"$unwind": "$student_group"},
+        {"$unwind": "$student_group.students"},
+        {
+            "$lookup": {
+                "from": "students",
+                "localField": "student_group.students",
+                "foreignField": "student_id",
+                "as": "student"
+            }
+        },
+        {"$unwind": "$student"},
+        {"$group": {
+            "_id": {
+                "title": "$title",
+                "language": "$language",
+                "level": "$level"
+            },
+            "average_student_age": {"$avg": "$student.age"},
+            "number_of_students": {"$sum": 1}
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "title": "$_id.title",
+                "language": "$_id.language",
+                "level": "$_id.level",
+                "average_student_age": {"$toInt": {"$round": ["$average_student_age", 0]}},
+                "number_of_students": 1
+            }
+        }
 
+    ]
+    report = list(db["courses"].aggregate(pipeline))
+
+    return render_template("average_age_report.html", reports= report )
