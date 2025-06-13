@@ -1,8 +1,11 @@
-from flask import Blueprint, render_template, request, redirect, url_for
-from db_connections import get_mysql_connection
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from db_connections import get_mysql_connection, get_mongo_connection
 from datetime import datetime
+from pymongo import ASCENDING, DESCENDING
 
 assignments_bp = Blueprint("assignments", __name__)
+
+#### **SQL Assignment Management**
 
 
 # ─── Assignment Submission ───────────────────────────────
@@ -115,7 +118,10 @@ def grade_assignment(mentor_id):
     assignments = cursor.fetchall()
 
     if request.method == "POST":
-        assignment_id = request.form["assignment_id"]
+        # assignment_id = request.form["assignment_id"]
+        raw_assignment_id = request.form["assignment_id"]
+        assignment_id = raw_assignment_id.split("::")[0]  # handles both "AS0001" and "AS0001::ST0001"
+
         grade = int(request.form["grade"])
         checked_date = datetime.now()
 
@@ -136,3 +142,177 @@ def grade_assignment(mentor_id):
         "grade_assignment.html", assignments=assignments, mentor_id=mentor_id
     )
 
+
+#### **NoSQL Assignment Management**
+
+
+# ─── Assignment Submission ───────────────────────────────
+@assignments_bp.route("/submit_assignment_nosql", methods=["GET", "POST"])
+def submit_assignment_nosql_select_student():
+    db = get_mongo_connection()
+    students_col = db["students"]
+    students = list(
+        students_col.find(
+            {}, {"student_id": 1, "first_name": 1, "last_name": 1, "_id": 0}
+        )
+    )
+
+    if request.method == "POST":
+        student_id = request.form["student_id"]
+        return redirect(
+            url_for(
+                "assignments.submit_assignment_nosql_for_student", student_id=student_id
+            )
+        )
+
+    return render_template("select_student.html", students=students)
+
+
+@assignments_bp.route("/submit-assignment-nosql/<student_id>", methods=["GET", "POST"])
+def submit_assignment_nosql_for_student(student_id):
+    db = get_mongo_connection()
+    assignments = []
+    current_time = datetime.now()
+    students_col = db["students"]
+
+    if request.method == "POST":
+        assignment_id = request.form["assignment_id"]
+        submission_date_str = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+
+        students_col.update_one(
+            {
+                "student_id": student_id,
+                "assignments.assignment_id": assignment_id,
+            },
+            {"$set": {"assignments.$.submission_date": submission_date_str}},
+        )
+
+        return redirect(
+            url_for(
+                "assignments.submit_assignment_nosql_for_student",
+                student_id=student_id,
+            )
+        )
+
+    student_doc = students_col.find_one({"student_id": student_id})
+
+    if student_doc:
+        for assign in student_doc.get("assignments", []):
+            adapted_assignment = {
+                "assignment_id": assign.get("assignment_id"),
+                "date_due": (
+                    datetime.strptime(assign.get("date_due", ""), "%Y-%m-%dT%H:%M:%S")
+                    if assign.get("date_due")
+                    else None
+                ),
+                "submission_date": (
+                    datetime.strptime(
+                        assign.get("submission_date", ""), "%Y-%m-%dT%H:%M:%S"
+                    )
+                    if assign.get("submission_date")
+                    else None
+                ),
+            }
+            assignments.append(adapted_assignment)
+
+    student_name = f"{student_doc.get('first_name')} {student_doc.get('last_name')}"
+
+    return render_template(
+        "submit_assignment.html",
+        student_name=student_name,
+        student_id=student_id,
+        assignments=assignments,
+        now=current_time,
+    )
+
+
+# ─── Assignment Grading ───────────────────────────────
+@assignments_bp.route("/grade_assignment_nosql", methods=["GET", "POST"])
+def grade_assignment_nosql_select_mentor():
+    db = get_mongo_connection()
+    employees_col = db["employees"]
+
+    mentors = list(
+        employees_col.find(
+            {"role": "mentor"},
+            {"employee_id": 1, "first_name": 1, "last_name": 1, "_id": 0},
+        )
+    )
+
+    mentor_id = [{"mentor_id": mentor.get("employee_id")} for mentor in mentors]
+
+    if request.method == "POST":
+        mentor_id = request.form["mentor_id"]
+        print(mentor_id)
+        return redirect(
+            url_for(
+                "assignments.grade_assignment_nosql_for_mentor", mentor_id=mentor_id
+            )
+        )
+
+    return render_template("select_mentor.html", mentors=mentor_id)
+
+
+@assignments_bp.route("/grade-assignment-nosql/<mentor_id>", methods=["GET", "POST"])
+def grade_assignment_nosql_for_mentor(mentor_id):
+    db = get_mongo_connection()
+    students_col = db["students"]
+    now = datetime.now()
+
+    assignments = []
+
+    student_cursor = students_col.find(
+        {"mentor_id": mentor_id},
+        {"student_id": 1, "first_name": 1, "last_name": 1, "assignments": 1},
+    )
+
+    for student in student_cursor:
+        for a in student.get("assignments", []):
+            eval_data = a.get("evaluation", {})
+            if a.get("submission_date") and not eval_data.get("grade"):
+                # Build assignment dict to match grade_assignment.html expectations
+                try:
+                    submission_date = datetime.strptime(
+                        a["submission_date"], "%Y-%m-%d"
+                    )
+                except:
+                    submission_date = None
+
+                assignments.append(
+                    {
+                        "assignment_id": a["assignment_id"],
+                        "from_student": student["student_id"],
+                        "first_name": student["first_name"],
+                        "last_name": student["last_name"],
+                        "submission_date": submission_date,
+                    }
+                )
+
+    if request.method == "POST":
+        assignment_value = request.form["assignment_id"]
+        assignment_id, student_id = assignment_value.split("::")
+
+
+        grade = int(request.form["grade"])
+        checked_date = datetime.now().strftime("%Y-%m-%d")
+
+        students_col.update_one(
+            {"student_id": student_id, "assignments.assignment_id": assignment_id},
+            {
+                "$set": {
+                    "assignments.$.evaluation.grade": grade,
+                    "assignments.$.evaluation.checked_date": checked_date,
+                }
+            },
+        )
+
+        flash("Assignment graded successfully!", "success")
+        return redirect(
+            url_for(
+                "assignments.grade_assignment_nosql_for_mentor", mentor_id=mentor_id
+            )
+        )
+
+    return render_template(
+        "grade_assignment.html", assignments=assignments, mentor_id=mentor_id, now=now
+    )

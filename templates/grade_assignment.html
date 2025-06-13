@@ -1,20 +1,43 @@
-<h2>Grade Assignments</h2>
-<form method="POST">
-  <input type="hidden" name="mentor_id" value="{{ mentor_id }}">
+<!DOCTYPE html>
+<html lang="en">
 
-  <label for="assignment_id">Assignment:</label>
-  <select name="assignment_id" required>
-    {% for a in assignments %}
-      <option value="{{ a.assignment_id }}">
-        {{ a.assignment_id }} - {{ a.first_name }} {{ a.last_name }} (Submitted: {{ a.submission_date }})
+<head>
+  <meta charset="UTF-8">
+  <title>Grade Assignments</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+  <h2>📋 Grade Assignments</h2>
+
+  <form method="POST">
+    <input type="hidden" name="mentor_id" value="{{ mentor_id }}">
+
+    <label for="assignment_id">Select Assignment</label>
+    <select name="assignment_id" required>
+      {% for a in assignments %}
+      {% if a.from_student %}
+      <!-- NoSQL: Pass combined assignment_id and student_id -->
+      <option value="{{ a.assignment_id }}::{{ a.from_student }}">
+        {{ a.assignment_id }} - {{ a.first_name }} {{ a.last_name }}
+        (Submitted: {{ a.submission_date.strftime('%Y-%m-%d') if a.submission_date else 'N/A' }})
       </option>
-    {% endfor %}
-  </select>
+      {% else %}
+      <!-- SQL: Pass assignment_id only -->
+      <option value="{{ a.assignment_id }}">
+        {{ a.assignment_id }} - {{ a.first_name }} {{ a.last_name }}
+        (Submitted: {{ a.submission_date.strftime('%Y-%m-%d') if a.submission_date else 'N/A' }})
+      </option>
+      {% endif %}
+      {% endfor %}
+    </select>
 
-  <br><br>
-  <label for="grade">Grade (0–100):</label>
-  <input type="number" name="grade" min="0" max="100" required>
+    <label for="grade">Grade (0–100)</label>
+    <input type="number" name="grade" min="0" max="100" required>
 
-  <br><br>
-  <button type="submit">Submit Grade</button>
-</form>
+    <button type="submit">Submit Grade</button>
+  </form>
+</body>
+
+</html>
