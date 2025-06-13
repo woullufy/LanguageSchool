@@ -118,7 +118,10 @@ def grade_assignment(mentor_id):
     assignments = cursor.fetchall()
 
     if request.method == "POST":
-        assignment_id = request.form["assignment_id"]
+        # assignment_id = request.form["assignment_id"]
+        raw_assignment_id = request.form["assignment_id"]
+        assignment_id = raw_assignment_id.split("::")[0]  # handles both "AS0001" and "AS0001::ST0001"
+
         grade = int(request.form["grade"])
         checked_date = datetime.now()
 
@@ -143,6 +146,7 @@ def grade_assignment(mentor_id):
 #### **NoSQL Assignment Management**
 
 
+# ─── Assignment Submission ───────────────────────────────
 @assignments_bp.route("/submit_assignment_nosql", methods=["GET", "POST"])
 def submit_assignment_nosql_select_student():
     db = get_mongo_connection()
@@ -164,7 +168,6 @@ def submit_assignment_nosql_select_student():
     return render_template("select_student.html", students=students)
 
 
-# # --- Assignment Submission - For Specific Student ---
 @assignments_bp.route("/submit-assignment-nosql/<student_id>", methods=["GET", "POST"])
 def submit_assignment_nosql_for_student(student_id):
     db = get_mongo_connection()
@@ -220,4 +223,96 @@ def submit_assignment_nosql_for_student(student_id):
         student_id=student_id,
         assignments=assignments,
         now=current_time,
+    )
+
+
+# ─── Assignment Grading ───────────────────────────────
+@assignments_bp.route("/grade_assignment_nosql", methods=["GET", "POST"])
+def grade_assignment_nosql_select_mentor():
+    db = get_mongo_connection()
+    employees_col = db["employees"]
+
+    mentors = list(
+        employees_col.find(
+            {"role": "mentor"},
+            {"employee_id": 1, "first_name": 1, "last_name": 1, "_id": 0},
+        )
+    )
+
+    mentor_id = [{"mentor_id": mentor.get("employee_id")} for mentor in mentors]
+
+    if request.method == "POST":
+        mentor_id = request.form["mentor_id"]
+        print(mentor_id)
+        return redirect(
+            url_for(
+                "assignments.grade_assignment_nosql_for_mentor", mentor_id=mentor_id
+            )
+        )
+
+    return render_template("select_mentor.html", mentors=mentor_id)
+
+
+@assignments_bp.route("/grade-assignment-nosql/<mentor_id>", methods=["GET", "POST"])
+def grade_assignment_nosql_for_mentor(mentor_id):
+    db = get_mongo_connection()
+    students_col = db["students"]
+    now = datetime.now()
+
+    assignments = []
+
+    student_cursor = students_col.find(
+        {"mentor_id": mentor_id},
+        {"student_id": 1, "first_name": 1, "last_name": 1, "assignments": 1},
+    )
+
+    for student in student_cursor:
+        for a in student.get("assignments", []):
+            eval_data = a.get("evaluation", {})
+            if a.get("submission_date") and not eval_data.get("grade"):
+                # Build assignment dict to match grade_assignment.html expectations
+                try:
+                    submission_date = datetime.strptime(
+                        a["submission_date"], "%Y-%m-%d"
+                    )
+                except:
+                    submission_date = None
+
+                assignments.append(
+                    {
+                        "assignment_id": a["assignment_id"],
+                        "from_student": student["student_id"],
+                        "first_name": student["first_name"],
+                        "last_name": student["last_name"],
+                        "submission_date": submission_date,
+                    }
+                )
+
+    if request.method == "POST":
+        assignment_value = request.form["assignment_id"]
+        assignment_id, student_id = assignment_value.split("::")
+
+
+        grade = int(request.form["grade"])
+        checked_date = datetime.now().strftime("%Y-%m-%d")
+
+        students_col.update_one(
+            {"student_id": student_id, "assignments.assignment_id": assignment_id},
+            {
+                "$set": {
+                    "assignments.$.evaluation.grade": grade,
+                    "assignments.$.evaluation.checked_date": checked_date,
+                }
+            },
+        )
+
+        flash("Assignment graded successfully!", "success")
+        return redirect(
+            url_for(
+                "assignments.grade_assignment_nosql_for_mentor", mentor_id=mentor_id
+            )
+        )
+
+    return render_template(
+        "grade_assignment.html", assignments=assignments, mentor_id=mentor_id, now=now
     )
