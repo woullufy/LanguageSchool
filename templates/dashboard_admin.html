@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administrator Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
 </head>
+
 <body class="{% if db_mode %}{{ db_mode }}-background{% else %}neutral-background{% endif %}">
     <div class="admin-dashboard-container">
         <h1>Administrator Dashboard</h1>
@@ -13,12 +15,12 @@
             <h2><span class="icon">⚙️</span> Application Database Mode</h2>
             <p>Select which database type the application should primarily interact with:</p>
             <form action="{{ url_for('main.set_db_mode') }}" method="post" class="db-mode-form">
-                <button type="submit" name="db_mode" value="sql"
-                    {% if current_db_mode == 'sql' %}class="active-mode"{% endif %}>
+                <button type="submit" name="db_mode" value="sql" {% if current_db_mode=='sql' %}class="active-mode" {%
+                    endif %}>
                     Use SQL (MariaDB)
                 </button>
-                <button type="submit" name="db_mode" value="nosql"
-                    {% if current_db_mode == 'nosql' %}class="active-mode"{% endif %}>
+                <button type="submit" name="db_mode" value="nosql" {% if current_db_mode=='nosql' %}class="active-mode"
+                    {% endif %}>
                     Use NoSQL (MongoDB)
                 </button>
             </form>
@@ -60,15 +62,16 @@
                 <form action="{{ url_for('reports.average_age_report') }}" method="get">
                     <button type="submit">📊 Avg. Age Report (SQL)</button>
                 </form>
-                <form action="{{ url_for('reports.graded_report') }}" method="get">
-                    <button type="submit">📈 Graded Report (SQL)</button>
-                </form>
-                <form action="{{ url_for('reports.nosql_high_performers') }}" method="get">
-                    <button type="submit">📊 High Performers (NoSQL)</button>
-                </form>
                 <form action="{{ url_for('reports.avg_age_report_nosql') }}" method="get">
                     <button type="submit">📈 Avg. Age Report (NoSQL)</button>
                 </form>
+                <form action="{{ url_for('reports.sql_graded_report') }}" method="get">
+                    <button type="submit">📈 Graded Report (SQL)</button>
+                </form>
+                <form action="{{ url_for('reports.nosql_graded_report') }}" method="get">
+                    <button type="submit">📊 Graded Report (NoSQL)</button>
+                </form>
+
             </div>
         </div>
 
@@ -79,4 +82,5 @@
         </div>
     </div>
 </body>
+
 </html>

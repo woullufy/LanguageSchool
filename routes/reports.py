@@ -6,7 +6,7 @@ reports_bp = Blueprint("reports", __name__)
 
 # Students Assignment's Grades
 @reports_bp.route("/graded-report", methods=["GET", "POST"])
-def graded_report():
+def sql_graded_report():
     threshold = 70
     mode = "above"
 
@@ -48,19 +48,43 @@ def graded_report():
     conn.close()
 
     return render_template(
-        "graded_report.html", results=results, threshold=threshold, mode=mode
+        "report_graded_assignments.html",
+        results=results,
+        threshold=threshold,
+        mode=mode,
     )
 
 
-@reports_bp.route("/nosql-high-performers")
-def nosql_high_performers():
+@reports_bp.route("/nosql-graded-report", methods=["GET", "POST"])
+def nosql_graded_report():
     threshold = 70
+    mode = "above"
+
+    if request.method == "POST":
+        try:
+            threshold = int(request.form["threshold"])
+            mode = request.form.get("mode", "above")
+        except ValueError:
+            pass
+
     db = get_mongo_connection()
-    students = db["students"]
+    students_col = db["students"]
+    employees_col = db["employees"]
+
+    comparator = "$gte" if mode == "above" else "$lt"
 
     pipeline = [
         {"$unwind": "$assignments"},
-        {"$match": {"assignments.evaluation.grade": {"$gte": threshold}}},
+        {"$match": {f"assignments.evaluation.grade": {comparator: threshold}}},
+        {
+            "$lookup": {
+                "from": "employees",
+                "localField": "mentor_id",
+                "foreignField": "employee_id",
+                "as": "mentor_info",
+            }
+        },
+        {"$unwind": "$mentor_info"},
         {
             "$project": {
                 "student_id": 1,
@@ -69,14 +93,26 @@ def nosql_high_performers():
                 "assignment_id": "$assignments.assignment_id",
                 "grade": "$assignments.evaluation.grade",
                 "checked_date": "$assignments.evaluation.checked_date",
+                "submission_date": "$assignments.submission_date",
+                "date_due": "$assignments.date_due",
+                "date_issued": "$assignments.date_issued",
+                "mentor_id": "$mentor_id",
+                "mentor_first_name": "$mentor_info.first_name",
+                "mentor_last_name": "$mentor_info.last_name",
             }
         },
         {"$sort": {"grade": -1}},
     ]
 
-    results = list(students.aggregate(pipeline))
+    results = list(students_col.aggregate(pipeline))
 
-    return render_template("nosql_report.html", results=results, threshold=70)
+    return render_template(
+        "report_graded_assignments.html",
+        results=results,
+        threshold=threshold,
+        mode=mode,
+        db_mode="nosql",
+    )
 
 
 # Average Group Age
@@ -96,7 +132,8 @@ def average_age_report():
         """
     )
     reports = cursor.fetchall()
-    return render_template("average_age_report.html", reports=reports)
+    return render_template("report_average_age.html", reports=reports)
+
 
 @reports_bp.route("/avg-age-report-nosql")
 def avg_age_report_nosql():
@@ -109,18 +146,15 @@ def avg_age_report_nosql():
                 "from": "students",
                 "localField": "student_group.students",
                 "foreignField": "student_id",
-                "as": "student"
+                "as": "student",
             }
         },
         {"$unwind": "$student"},
-        {"$group": {
-            "_id": {
-                "title": "$title",
-                "language": "$language",
-                "level": "$level"
-            },
-            "average_student_age": {"$avg": "$student.age"},
-            "number_of_students": {"$sum": 1}
+        {
+            "$group": {
+                "_id": {"title": "$title", "language": "$language", "level": "$level"},
+                "average_student_age": {"$avg": "$student.age"},
+                "number_of_students": {"$sum": 1},
             }
         },
         {
@@ -129,12 +163,13 @@ def avg_age_report_nosql():
                 "title": "$_id.title",
                 "language": "$_id.language",
                 "level": "$_id.level",
-                "average_student_age": {"$toInt": {"$round": ["$average_student_age", 0]}},
-                "number_of_students": 1
+                "average_student_age": {
+                    "$toInt": {"$round": ["$average_student_age", 0]}
+                },
+                "number_of_students": 1,
             }
-        }
-
+        },
     ]
     report = list(db["courses"].aggregate(pipeline))
 
-    return render_template("average_age_report.html", reports= report )
+    return render_template("report_average_age.html", reports=report)
