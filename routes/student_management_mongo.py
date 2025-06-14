@@ -24,7 +24,7 @@ def select_student():
 @student_management_mongo_bp.route(
     "/select-course-mongo/<student_id>", methods=["GET", "POST"]
 )
-def select_course(student_id):
+def select_course_nosql(student_id):
     db = get_mongo_connection()
     courses = db["courses"].find()
 
@@ -38,9 +38,10 @@ def select_course(student_id):
                 student_id=student_id,
             )
         )
-
     return render_template(
-        "select_course_mongo.html", courses=courses, student_id=student_id
+        "select_course.html", courses=courses, student_id=student_id, db_mode="nosql",
+        back_url=url_for("student_management_nosql.select_student"),
+        select_action=url_for("student_management_nosql.select_course_nosql", student_id=student_id),
     )
 
 

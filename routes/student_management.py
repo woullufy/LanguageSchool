@@ -23,7 +23,13 @@ def select_course(student_id):
             )
         )
 
-    return render_template("select_course.html", courses=courses, student_id=student_id)
+    # return render_template("select_course.html", courses=courses, student_id=student_id)
+    return render_template(
+        "select_course.html", courses=courses, student_id=student_id, db_mode="sql", 
+        back_url=url_for("student_management.select_student"),
+        select_action=url_for("student_management.select_course", student_id=student_id),
+    )
+
 
 
 @student_management_bp.route("/select-student", methods=["GET", "POST"])
@@ -43,9 +49,7 @@ def select_student():
     return render_template("select_student.html", students=students)
 
 
-@student_management_bp.route(
-    "/course-groups/<course_id>/<student_id>", methods=["GET", "POST"]
-)
+@student_management_bp.route("/course-groups/<course_id>/<student_id>", methods=["GET", "POST"])
 def course_groups(course_id, student_id):
     conn = get_mysql_connection()
     cursor = conn.cursor(dictionary=True)
