@@ -21,16 +21,20 @@ def dashboard_student():
     if request.method == "POST":
         student_id = request.form.get("student_id")
         student_name = get_student_name(student_id, db_mode)
+        student_age = get_student_age(student_id, db_mode)
         session["current_student_id"] = student_id
         session["current_student_name"] = student_name
+        session["current_student_age"] = student_age
     else:
         student_id = session.get("current_student_id")
         student_name = session.get("current_student_name", "Student")
+        student_age = session.get("current_student_age", "Unknown")
 
     return render_template(
         "dashboards/student.html",
         student_id=student_id,
         student_name=student_name,
+        student_age=student_age,
         db_mode=db_mode,
     )
 
@@ -307,7 +311,7 @@ def grade_assignments_nosql_for_mentor(mentor_id):
 def get_students_sql():
     conn = get_mysql_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT student_id, first_name, last_name FROM student")
+    cursor.execute("SELECT student_id, first_name, last_name, age FROM student")
     students = cursor.fetchall()
     conn.close()
     return students
@@ -317,7 +321,7 @@ def get_students_nosql():
     db = get_mongo_connection()
     return list(
         db["students"].find(
-            {}, {"student_id": 1, "first_name": 1, "last_name": 1, "_id": 0}
+            {}, {"student_id": 1, "first_name": 1, "last_name": 1, "age": 1, "_id": 0}
         )
     )
 
@@ -377,6 +381,28 @@ def get_student_name(student_id, db_mode):
         if result:
             return f"{result['first_name']} {result['last_name']}"
     return "Guest Student"
+
+
+def get_student_age(student_id, db_mode):
+    if db_mode == "nosql":
+        db = get_mongo_connection()
+        student = db["students"].find_one(
+            {"student_id": student_id}, {"age": 1}
+        )
+        if student:
+            return f"{student.get('age')}"
+    else:
+        conn = get_mysql_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            "SELECT age FROM student WHERE student_id = %s",
+            (student_id,),
+        )
+        result = cursor.fetchone()
+        conn.close()
+        if result:
+            return f"{result['age']}"
+    return "Unknown"
 
 
 def get_mentor_name(mentor_id, db_mode):

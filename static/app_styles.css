@@ -98,8 +98,14 @@ a:hover {
 .student-id-display {
     font-size: 1.1em;
     color: #777;
-    margin-top: -15px;
-    margin-bottom: 30px;
+    margin-top: -20px;
+    margin-bottom: 0px;
+}
+.student-age-display {
+    font-size: 1.1em;
+    color: #777;
+    margin-top: -25px;
+    margin-bottom: 0px;
 }
 
 /* Sections within Dashboards */
