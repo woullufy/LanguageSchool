@@ -64,21 +64,20 @@ def show_tables_employees():
     employees = list(employees_collection.find({}))
     return render_template("employees_mongo.html", employees=employees)
 
+
 @main_bp.route("/set-db-mode", methods=["POST"])
 def set_db_mode():
     mode = request.form.get("db_mode")
-    session['active_db_mode'] = mode
+    session["active_db_mode"] = mode
     return redirect(url_for("main.admin_dashboard"))
 
 
 @main_bp.route("/admin-dashboard")
-def admin_dashboard():
-    db_mode = session.get('active_db_mode', 'sql')
-    return render_template("admin_dashboard.html", db_mode=db_mode)
+def dashboard_admin():
+    db_mode = session.get("active_db_mode", "sql")
+    return render_template("dashboard_admin.html", db_mode=db_mode)
 
 
 @main_bp.route("/")
 def index():
     return render_template("index.html")
-
-

@@ -1,27 +1,12 @@
-
-*, *::before, *::after {
+/* Base Styles & Resets */
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-body.sql-background {
-    background-color: #d33e3e;
-}
-
-body.nosql-background {
-    background-color: #5cbe66;
-}
-
-body.neutral-background {
-    background-color: #235682;
-}
-
-/* --- Base Body Styles (should apply *after* specific backgrounds if you want a default) ---
-   However, if you're always applying a class (sql-background, nosql-background, or neutral-background)
-   via Flask, then this 'body' rule setting a background-color directly isn't strictly necessary.
-   I've kept your original #f0f2f5 here, assuming 'neutral-background' will align with it.
-*/
 body {
     font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.6;
@@ -34,27 +19,25 @@ body {
     padding: 20px;
 }
 
-/* Ensure the main content containers have a solid background to stand out */
-.admin-dashboard-container,
-.student-dashboard-container,
-.selection-container,
-.admin-section,
-.dashboard-section,
-.role-card,
-.action-card,
-.group-registration-container, /* From student_management.py template */
-.admin-selection-container,   /* From student_management.py template */
-table {
-    background-color: #ffffff; /* Solid white background for content containers */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Consistent shadow */
-    /* Add padding/margin as needed for your specific layout */
+/* Backgrounds based on DB mode */
+body.sql-background {
+    background-color: #d33e3e;
 }
 
+body.nosql-background {
+    background-color: #5cbe66;
+}
 
-/* --- Global Typography and Element Styles --- */
-h1, h2, h3 {
+body.neutral-background {
+    background-color: #235682;
+}
+
+/* Typography */
+h1,
+h2,
+h3 {
     font-weight: 600;
-    color: #2c3e50; /* Darker blue-grey for headings */
+    color: #2c3e50;
     margin-bottom: 0.8em;
 }
 
@@ -81,38 +64,146 @@ a:hover {
     text-decoration: underline;
 }
 
-button, input[type="submit"] {
-    background-color: #007bff;
-    color: white;
+/* Layout Containers & Shadows */
+.admin-dashboard-container,
+.student-dashboard-container,
+.selection-container,
+.group-registration-container,
+.admin-selection-container,
+.container {
+    background-color: #ffffff;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 18px;
+    padding: 45px;
+    text-align: center;
+    width: 100%;
+    max-width: 900px;
+    margin: 40px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.admin-dashboard-container h1,
+.student-dashboard-container h1,
+.selection-container h2 {
+    font-size: 2.2em;
+    color: #1a2a3a;
+    margin-bottom: 25px;
+    line-height: 1.2;
+}
+
+.student-id-display {
+    font-size: 1.1em;
+    color: #777;
+    margin-top: -15px;
+    margin-bottom: 30px;
+}
+
+/* Sections within Dashboards */
+.admin-section,
+.dashboard-section {
+    padding: 30px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    text-align: left;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.admin-section h2,
+.dashboard-section h2 {
+    font-size: 1.7em;
+    color: #333;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+    display: inline-block;
+}
+
+/* Buttons */
+button,
+input[type="submit"],
+.button {
     border: none;
     padding: 12px 25px;
     border-radius: 8px;
     font-size: 1em;
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
-    box-shadow: 0 3px 8px rgba(0, 123, 255, 0.2);
-    width: auto; /* Allow buttons to size to content unless specified */
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    width: auto;
+    background-color: #007bff;
+    color: white;
 }
 
-button:hover, input[type="submit"]:hover {
+button:hover,
+input[type="submit"]:hover,
+.button:hover {
     background-color: #0056b3;
     transform: translateY(-1px);
 }
 
-button:disabled {
+button:disabled,
+.button-disabled {
     background-color: #cccccc;
+    color: #666666;
     cursor: not-allowed;
     box-shadow: none;
     transform: none;
 }
 
-/* --- Utility Classes --- */
-.text-center { text-align: center; }
-.mt-30 { margin-top: 30px; }
-.mb-20 { margin-bottom: 20px; }
+.button-primary {
+    background-color: #007bff;
+    color: white;
+}
 
+.button-primary:hover {
+    background-color: #0056b3;
+}
 
-/* --- Flash Messages --- */
+.button-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.button-secondary:hover {
+    background-color: #5a6268;
+}
+
+.button-small {
+    padding: 8px 12px;
+    font-size: 0.85em;
+    min-width: unset;
+}
+
+.home-button-form {
+    margin-bottom: 30px;
+}
+
+.back-to-main-menu {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.back-to-main-menu button {
+    background-color: #dc3545;
+    padding: 12px 30px;
+    font-size: 1.1em;
+    border-radius: 8px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    box-shadow: 0 3px 8px rgba(220, 53, 69, 0.2);
+    width: auto;
+    display: inline-block;
+}
+
+.back-to-main-menu button:hover {
+    background-color: #c82333;
+}
+
+/* Flash Messages */
 .flash-messages {
     width: 100%;
     max-width: 800px;
@@ -157,8 +248,7 @@ button:disabled {
     border: 1px solid #ffeeba;
 }
 
-
-/* --- Main Index Page (Role Selection) --- */
+/* Role Selection Cards */
 .select-role-description {
     font-size: 1.25em;
     color: #555;
@@ -168,13 +258,13 @@ button:disabled {
 
 .dashboard-grid-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive columns */
-    gap: 30px; /* Space between cards */
-    max-width: 1200px; /* Max width of the grid itself */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
     width: 100%;
     padding: 20px;
-    justify-content: center; /* Center grid items horizontally */
-    margin: auto; /* Center the grid container */
+    justify-content: center;
+    margin: auto;
 }
 
 .role-card {
@@ -189,21 +279,21 @@ button:disabled {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    border: 2px solid transparent; /* Default transparent border */
-    min-height: 250px; /* Ensure consistent height */
+    border: 2px solid transparent;
+    min-height: 250px;
 }
 
 .role-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-    border-color: #007bff; /* Highlight border on hover */
+    border-color: #007bff;
 }
 
 .role-card .icon {
-    font-size: 4.5em; /* Larger icons */
+    font-size: 4.5em;
     margin-bottom: 20px;
-    line-height: 1; /* Remove extra line height */
-    color: #007bff; /* Default icon color */
+    line-height: 1;
+    color: #007bff;
 }
 
 .role-card h2 {
@@ -216,100 +306,94 @@ button:disabled {
     font-size: 1.05em;
     color: #666;
     margin-bottom: 25px;
-    flex-grow: 1; /* Allows paragraph to take available space */
+    flex-grow: 1;
 }
 
 .role-card button {
-    width: 80%; /* Button takes more width within the card */
+    width: 80%;
     padding: 14px 25px;
     font-size: 1.1em;
     border-radius: 10px;
-    margin-top: auto; /* Pushes button to bottom of flex container */
+    margin-top: auto;
 }
 
-/* Specific Role Card Colors */
-.role-card.student .icon { color: #28a745; } /* Green */
-.role-card.student button { background-color: #28a745; box-shadow: 0 3px 8px rgba(40, 167, 69, 0.2); }
-.role-card.student button:hover { background-color: #218838; }
-.role-card.student:hover { border-color: #28a745; }
-
-.role-card.mentor .icon { color: #ffc107; } /* Yellow */
-.role-card.mentor button { background-color: #ffc107; color: #333; box-shadow: 0 3px 8px rgba(255, 193, 7, 0.2); }
-.role-card.mentor button:hover { background-color: #e0a800; }
-.role-card.mentor:hover { border-color: #ffc107; }
-
-.role-card.admin .icon { color: #007bff; } /* Blue */
-.role-card.admin button { background-color: #007bff; box-shadow: 0 3px 8px rgba(0, 123, 255, 0.2); }
-.role-card.admin button:hover { background-color: #0056b3; }
-.role-card.admin:hover { border-color: #007bff; }
-
-.role-card.tutor .icon { color: #6c757d; } /* Grey */
-.role-card.tutor button { background-color: #6c757d; box-shadow: 0 3px 8px rgba(108, 117, 125, 0.2); }
-.role-card.tutor button:hover { background-color: #5a6268; }
-.role-card.tutor:hover { border-color: #6c757d; }
-
-
-/* --- General Dashboard / Selection Page Container Styles --- */
-/* Used for admin_dashboard.html, student_dashboard.html, select_student.html */
-.admin-dashboard-container,
-.student-dashboard-container,
-.selection-container {
-    border-radius: 18px; /* More rounded corners */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    padding: 45px;
-    text-align: center;
-    width: 100%;
-    max-width: 900px; /* Wider main containers */
-    margin: 40px auto;
-    display: flex;
-    flex-direction: column;
-    gap: 30px; /* Space between sections/elements */
+.role-card.student .icon {
+    color: #28a745;
 }
 
-.admin-dashboard-container h1,
-.student-dashboard-container h1,
-.selection-container h2 {
-    font-size: 2.2em;
-    color: #1a2a3a;
-    margin-bottom: 25px;
-    line-height: 1.2;
+.role-card.student button {
+    background-color: #28a745;
+    box-shadow: 0 3px 8px rgba(40, 167, 69, 0.2);
 }
 
-.student-id-display {
-    font-size: 1.1em;
-    color: #777;
-    margin-top: -15px; /* Pull it closer to the welcome message */
-    margin-bottom: 30px;
+.role-card.student button:hover {
+    background-color: #218838;
 }
 
-/* --- Sections within Dashboards (e.g., Database Management) --- */
-.admin-section, .dashboard-section {
-    padding: 30px;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    /* background-color: #fdfdfd; - Removed, handled by .admin-dashboard-container etc. */
-    text-align: left;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+.role-card.student:hover {
+    border-color: #28a745;
 }
 
-.admin-section h2, .dashboard-section h2 {
-    font-size: 1.7em;
+.role-card.mentor .icon {
+    color: #ffc107;
+}
+
+.role-card.mentor button {
+    background-color: #ffc107;
     color: #333;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #007bff;
-    padding-bottom: 10px;
-    display: inline-block;
+    box-shadow: 0 3px 8px rgba(255, 193, 7, 0.2);
 }
 
-/* Admin DB Mode Selector - Specific Styles */
+.role-card.mentor button:hover {
+    background-color: #e0a800;
+}
+
+.role-card.mentor:hover {
+    border-color: #ffc107;
+}
+
+.role-card.admin .icon {
+    color: #007bff;
+}
+
+.role-card.admin button {
+    background-color: #007bff;
+    box-shadow: 0 3px 8px rgba(0, 123, 255, 0.2);
+}
+
+.role-card.admin button:hover {
+    background-color: #0056b3;
+}
+
+.role-card.admin:hover {
+    border-color: #007bff;
+}
+
+.role-card.tutor .icon {
+    color: #6c757d;
+}
+
+.role-card.tutor button {
+    background-color: #6c757d;
+    box-shadow: 0 3px 8px rgba(108, 117, 125, 0.2);
+}
+
+.role-card.tutor button:hover {
+    background-color: #5a6268;
+}
+
+.role-card.tutor:hover {
+    border-color: #6c757d;
+}
+
+/* DB Mode Selector */
 .admin-section.db-mode-selector {
     text-align: center;
-    border: 2px solid #007bff; /* Highlight this section */
-    /* background-color: #e9f5ff; - Removed, handled by .admin-dashboard-container etc. */
+    border: 2px solid #007bff;
 }
 
 .db-mode-selector h2 .icon {
-    color: #007bff; /* Icon color for this section */
+    color: #007bff;
 }
 
 .db-mode-selector p {
@@ -321,15 +405,15 @@ button:disabled {
 .db-mode-form {
     display: flex;
     justify-content: center;
-    gap: 20px; /* Space between the mode buttons */
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
 .db-mode-form button {
-    background-color: #6c757d; /* Default button color */
+    background-color: #6c757d;
     box-shadow: 0 3px 8px rgba(108, 117, 125, 0.2);
-    flex-grow: 1; /* Allow buttons to grow */
-    max-width: 250px; /* Max width for individual buttons */
+    flex-grow: 1;
+    max-width: 250px;
     padding: 14px 20px;
     font-size: 1.1em;
 }
@@ -339,44 +423,63 @@ button:disabled {
 }
 
 .db-mode-form button.active-mode {
-    background-color: #007bff; /* Blue for active SQL */
+    background-color: #007bff;
     box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
     border: 2px solid #0056b3;
     font-weight: bold;
     transform: translateY(-2px);
 }
+
 .db-mode-form button[value="nosql"].active-mode {
-    background-color: #28a745; /* Green for active NoSQL */
+    background-color: #28a745;
     box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
     border: 2px solid #218838;
 }
 
-
-/* --- Action Grid for Buttons within Dashboards --- */
-.button-grid, .action-grid {
+/* Button & Action Grids */
+.button-grid,
+.action-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
     margin-top: 25px;
 }
 
-.button-grid form, .action-grid form {
+.button-grid form,
+.action-grid form {
     margin: 0;
 }
 
-/* Specific button styles for admin dashboard sections */
-.admin-section.db-management button { background-color: #6c757d; box-shadow: 0 3px 8px rgba(108, 117, 125, 0.2); }
-.admin-section.db-management button:hover { background-color: #5a6268; }
+.admin-section.db-management button {
+    background-color: #6c757d;
+    box-shadow: 0 3px 8px rgba(108, 117, 125, 0.2);
+}
 
-.admin-section.nosql-views button { background-color: #20c997; box-shadow: 0 3px 8px rgba(32, 201, 151, 0.2); }
-.admin-section.nosql-views button:hover { background-color: #17a2b8; }
+.admin-section.db-management button:hover {
+    background-color: #5a6268;
+}
 
-.admin-section.reports button { background-color: #ffc107; color: #333; box-shadow: 0 3px 8px rgba(255, 193, 7, 0.2); }
-.admin-section.reports button:hover { background-color: #e0a800; }
+.admin-section.nosql-views button {
+    background-color: #20c997;
+    box-shadow: 0 3px 8px rgba(32, 201, 151, 0.2);
+}
 
-/* --- Action Card for Student Dashboard --- */
+.admin-section.nosql-views button:hover {
+    background-color: #17a2b8;
+}
+
+.admin-section.reports button {
+    background-color: #ffc107;
+    color: #333;
+    box-shadow: 0 3px 8px rgba(255, 193, 7, 0.2);
+}
+
+.admin-section.reports button:hover {
+    background-color: #e0a800;
+}
+
+/* Action Cards */
 .action-card {
-    /* background-color: #fefefe; - Removed, handled by .admin-dashboard-container etc. */
     border: 1px solid #e5e5e5;
     border-radius: 12px;
     padding: 30px;
@@ -386,7 +489,7 @@ button:disabled {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 220px; /* Ensure consistent height for cards */
+    min-height: 220px;
 }
 
 .action-card:hover {
@@ -420,18 +523,42 @@ button:disabled {
     font-size: 1em;
 }
 
-/* Specific colors for action cards */
-.action-card.submit-sql .icon { color: #007bff; } /* Blue for SQL */
-.action-card.submit-sql button { background-color: #007bff; }
-.action-card.submit-sql button:hover { background-color: #0056b3; }
+.action-card.submit-sql .icon {
+    color: #007bff;
+}
 
-.action-card.submit-nosql .icon { color: #28a745; } /* Green for NoSQL (if added later) */
-.action-card.submit-nosql button { background-color: #28a745; }
-.action-card.submit-nosql button:hover { background-color: #218838; }
+.action-card.submit-sql button {
+    background-color: #007bff;
+}
 
-.action-card.register .icon { color: #ffc107; } /* Yellow for registration */
-.action-card.register button { background-color: #ffc107; color: #333; }
-.action-card.register button:hover { background-color: #e0a800; }
+.action-card.submit-sql button:hover {
+    background-color: #0056b3;
+}
+
+.action-card.submit-nosql .icon {
+    color: #28a745;
+}
+
+.action-card.submit-nosql button {
+    background-color: #28a745;
+}
+
+.action-card.submit-nosql button:hover {
+    background-color: #218838;
+}
+
+.action-card.register .icon {
+    color: #ffc107;
+}
+
+.action-card.register button {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.action-card.register button:hover {
+    background-color: #e0a800;
+}
 
 .action-card.coming-soon button {
     background-color: #cccccc;
@@ -439,15 +566,17 @@ button:disabled {
     box-shadow: none;
     transform: none;
 }
-.action-card.coming-soon .icon { color: #a0a0a0; }
 
+.action-card.coming-soon .icon {
+    color: #a0a0a0;
+}
 
-/* --- Selection Page (select_student.html, select_mentor.html) --- */
+/* Selection Forms (e.g., Select Student) */
 .selection-container label {
     font-size: 1.1em;
     color: #555;
     margin-bottom: 15px;
-    display: block; /* Make label a block for better spacing */
+    display: block;
     text-align: left;
 }
 
@@ -460,7 +589,7 @@ button:disabled {
     font-size: 1em;
     background-color: #f8f8f8;
     color: #333;
-    appearance: none; /* Remove default dropdown arrow */
+    appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%23666' d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.757 7.586 5.343 9z'/%3E%3C/svg%3E");
@@ -480,223 +609,75 @@ button:disabled {
     margin-top: 20px;
 }
 
-/* --- Back Button Common Style --- */
-.back-to-main-menu {
-    margin-top: 30px;
-    text-align: center;
+/* Tables (General & Specific) */
+table {
+    border-radius: 10px;
 }
 
-.back-to-main-menu button {
-    background-color: #dc3545; /* Red for exit/back */
-    padding: 12px 30px;
-    font-size: 1.1em;
-    border-radius: 8px;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    box-shadow: 0 3px 8px rgba(220, 53, 69, 0.2);
-    width: auto; /* Allow sizing to content */
-    display: inline-block; /* For centering */
-}
-
-.back-to-main-menu button:hover {
-    background-color: #c82333;
-}
-
-
-/* --- Responsive Adjustments --- */
-@media (max-width: 992px) {
-    h1 { font-size: 2.2em; }
-    .dashboard-grid-container { gap: 25px; padding: 15px; }
-    .role-card { padding: 30px; min-height: unset; }
-    .role-card .icon { font-size: 4em; }
-    .role-card h2 { font-size: 1.7em; }
-
-    .admin-dashboard-container,
-    .student-dashboard-container,
-    .selection-container {
-        padding: 35px;
-        max-width: 700px;
-    }
-    .admin-section, .dashboard-section { padding: 25px; }
-    .admin-section h2, .dashboard-section h2 { font-size: 1.5em; }
-    .action-card { padding: 25px; min-height: unset; }
-    .action-card .icon { font-size: 3em; }
-    .action-card h3 { font-size: 1.4em; }
-}
-
-@media (max-width: 768px) {
-    h1 { font-size: 1.8em; margin-bottom: 20px; }
-    .select-role-description { font-size: 1.1em; margin-bottom: 30px; }
-    .dashboard-grid-container {
-        grid-template-columns: 1fr; /* Stack cards vertically on smaller screens */
-        gap: 20px;
-        padding: 10px;
-    }
-    .role-card {
-        max-width: 400px; /* Limit width of stacked cards */
-        margin: 0 auto; /* Center stacked cards */
-    }
-
-    .admin-dashboard-container,
-    .student-dashboard-container,
-    .selection-container {
-        padding: 25px;
-        margin: 20px auto;
-        gap: 20px;
-    }
-    .admin-dashboard-container h1,
-    .student-dashboard-container h1,
-    .selection-container h2 {
-        font-size: 1.9em;
-        margin-bottom: 20px;
-    }
-    .student-id-display { font-size: 1em; margin-bottom: 20px; }
-
-    .admin-section, .dashboard-section { padding: 20px; }
-    .admin-section h2, .dashboard-section h2 { font-size: 1.3em; }
-
-    .button-grid, .action-grid {
-        grid-template-columns: 1fr; /* Stack buttons vertically */
-        gap: 15px;
-        margin-top: 20px;
-    }
-    .action-card { padding: 20px; }
-    .action-card .icon { font-size: 2.8em; }
-    .action-card h3 { font-size: 1.3em; }
-    .action-card p { font-size: 0.9em; }
-
-    .selection-container select,
-    .selection-container button,
-    .back-to-main-menu button {
-        padding: 10px 15px;
-        font-size: 0.95em;
-    }
-}
-
-@media (max-width: 480px) {
-    h1 { font-size: 1.5em; }
-    .select-role-description { font-size: 1em; }
-    .role-card { padding: 25px; }
-    .role-card .icon { font-size: 3.5em; }
-    .role-card h2 { font-size: 1.5em; }
-    .role-card button { font-size: 1em; padding: 12px 15px; }
-}
-
-/* --- Styles for submit_assignment.html --- */
-
-/* Main container for centering content */
-.container {
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-    padding: 40px;
-    margin: 40px auto; /* Center the container with some top/bottom margin */
-    max-width: 900px; /* Limit width for readability */
-    width: 90%; /* Responsive width */
-    text-align: center; /* Center h2 and form elements */
-}
-
-.container h2 {
-    color: #2c3e50;
-    margin-bottom: 30px;
-    font-size: 2.2em;
-}
-
-/* Home button styling */
-.home-button-form {
-    margin-bottom: 30px;
-}
-
-/* Base button styles (reusing/refining from your existing ones) */
-.button {
-    border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
-    font-size: 1em;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-}
-
-.button:hover {
-    transform: translateY(-1px);
-}
-
-.button-primary {
-    background-color: #007bff; /* Blue for primary actions (Submit) */
-    color: white;
-}
-
-.button-primary:hover {
-    background-color: #0056b3;
-}
-
-.button-secondary {
-    background-color: #6c757d; /* Grey for secondary actions (Home) */
-    color: white;
-}
-
-.button-secondary:hover {
-    background-color: #5a6268;
-}
-
-.button-disabled {
-    background-color: #cccccc;
-    color: #666666;
-    cursor: not-allowed;
-    box-shadow: none;
-    transform: none;
-}
-
-/* Table styling */
-.styled-table {
+.styled-table,
+.data-table {
     width: 100%;
     border-collapse: collapse;
     margin: 25px 0;
     font-size: 0.95em;
     min-width: 400px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-    border-radius: 10px; /* Rounded corners for the table */
-    overflow: hidden; /* Ensures rounded corners apply to content */
+    overflow: hidden;
 }
 
-.styled-table thead tr {
+.styled-table thead tr,
+.data-table thead tr {
     background-color: #007bff;
     color: #ffffff;
     text-align: left;
 }
 
 .styled-table th,
-.styled-table td {
+.styled-table td,
+.data-table th,
+.data-table td {
     padding: 12px 15px;
-    border: 1px solid #dddddd; /* Light border for cells */
+    border: 1px solid #dddddd;
 }
 
-.styled-table tbody tr {
+.styled-table tbody tr,
+.data-table tbody tr {
     border-bottom: 1px solid #dddddd;
 }
 
-.styled-table tbody tr:nth-of-type(even) {
-    background-color: #f3f3f3; /* Zebra striping */
+.styled-table tbody tr:nth-of-type(even),
+.data-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
 }
 
-.styled-table tbody tr:last-of-type {
+.styled-table tbody tr:last-of-type,
+.data-table tbody tr:last-of-type {
     border-bottom: 2px solid #007bff;
 }
 
 .styled-table tbody tr.overdue {
-    background-color: #f8d7da; /* Light red for overdue */
-    color: #721c24; /* Dark red text */
+    background-color: #f8d7da;
+    color: #721c24;
     font-weight: bold;
 }
 
 .styled-table tbody tr.overdue .badge {
-    border-color: #721c24; /* Make badge border visible against red background */
+    border-color: #721c24;
 }
 
-/* Badge styling for status */
+.styled-table td form,
+.data-table td form {
+    margin: 0;
+    display: inline-block;
+}
+
+.styled-table td .button,
+.data-table td .button {
+    padding: 8px 15px;
+    font-size: 0.9em;
+}
+
+/* Badges */
 .badge {
     padding: 6px 10px;
     border-radius: 20px;
@@ -704,118 +685,39 @@ button:disabled {
     font-weight: 600;
     text-transform: uppercase;
     display: inline-block;
-    min-width: 120px; /* Consistent width for badges */
+    min-width: 120px;
     text-align: center;
 }
 
 .badge-submitted {
-    background-color: #e2f0d9; /* Light green */
-    color: #28a745; /* Darker green */
+    background-color: #e2f0d9;
+    color: #28a745;
     border: 1px solid #28a745;
 }
 
 .badge-pending {
-    background-color: #fff3cd; /* Light yellow */
-    color: #ffc107; /* Darker yellow */
+    background-color: #fff3cd;
+    color: #ffc107;
     border: 1px solid #ffc107;
 }
 
-/* Ensure table buttons are sized correctly */
-.styled-table td form {
-    margin: 0; /* Remove default form margin */
-    display: inline-block; /* Keep button inline with other table content */
-}
-
-.styled-table td .button {
-    padding: 8px 15px; /* Smaller padding for table buttons */
-    font-size: 0.9em;
-}
-
-/* Responsive adjustments for tables */
-@media (max-width: 768px) {
-    .styled-table {
-        font-size: 0.85em;
-    }
-    .styled-table th, .styled-table td {
-        padding: 8px 10px;
-    }
-    .container {
-        padding: 25px;
-        margin: 20px auto;
-    }
-    .container h2 {
-        font-size: 1.8em;
-    }
-    .badge {
-        min-width: 100px;
-        padding: 5px 8px;
-        font-size: 0.8em;
-    }
-    .styled-table td .button {
-        padding: 6px 12px;
-        font-size: 0.85em;
-    }
-}
-
-@media (max-width: 480px) {
-    .styled-table, .styled-table thead, .styled-table tbody, .styled-table th, .styled-table td, .styled-table tr {
-        display: block; /* Make table elements stack for small screens */
-    }
-    .styled-table thead tr {
-        position: absolute;
-        top: -9999px;
-        left: -9999px;
-    }
-    .styled-table tr {
-        margin-bottom: 15px;
-        border: 1px solid #dddddd;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-    .styled-table td {
-        border: none;
-        position: relative;
-        padding-left: 50%; /* Space for the "label" */
-        text-align: right;
-    }
-    .styled-table td::before {
-        content: attr(data-label); /* Use data-label for content */
-        position: absolute;
-        left: 6px;
-        width: 45%;
-        padding-right: 10px;
-        white-space: nowrap;
-        text-align: left;
-        font-weight: bold;
-        color: #007bff;
-    }
-    /* Add data-label attributes to your HTML <td> elements for this to work */
-    /* Example: <td data-label="Assignment ID">{{ a.assignment_id }}</td> */
-    .styled-table tbody tr.overdue td::before {
-        color: #721c24; /* Overdue label color */
-    }
-}
-
-/* Add these new styles to your existing app_styles.css */
-
-/* Styling for the grade input field */
+/* Grade Input Specifics */
 .grade-form {
-    display: flex; /* Use flexbox to align input and button horizontally */
+    display: flex;
     align-items: center;
-    gap: 10px; /* Space between the input and button */
-    justify-content: center; /* Center items within the form */
+    gap: 10px;
+    justify-content: center;
 }
 
 .grade-input {
-    width: 80px; /* Fixed width for grade input */
+    width: 80px;
     padding: 8px 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 0.95em;
-    text-align: center; /* Center the numbers */
+    text-align: center;
 }
 
-/* Hide spinner buttons for number input in WebKit browsers (Chrome, Safari) */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -828,60 +730,15 @@ input[type="number"]::-webkit-inner-spin-button {
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
-/* Smaller button for inside the table */
-.button-small {
-    padding: 8px 12px; /* Smaller padding */
-    font-size: 0.85em; /* Smaller font size */
-    min-width: unset; /* Remove min-width if inherited from other button styles */
+/* Utility Classes */
+.text-center {
+    text-align: center;
 }
 
-/* Ensure the data-table styling applies consistently */
-.data-table {
-    /* If you have a separate .data-table style, merge it with .styled-table if they are similar.
-       For now, just ensuring it has the core look. */
-    width: 100%;
-    border-collapse: collapse;
-    margin: 25px 0;
-    font-size: 0.95em;
-    min-width: 400px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-    border-radius: 10px;
-    overflow: hidden;
+.mt-30 {
+    margin-top: 30px;
 }
 
-/* Re-apply table styles you already have from the submit_assignment.html styling */
-.styled-table thead tr {
-    background-color: #007bff;
-    color: #ffffff;
-    text-align: left;
-}
-
-.styled-table th,
-.styled-table td {
-    padding: 12px 15px;
-    border: 1px solid #dddddd;
-}
-
-.styled-table tbody tr {
-    border-bottom: 1px solid #dddddd;
-}
-
-.styled-table tbody tr:nth-of-type(even) {
-    background-color: #f3f3f3;
-}
-
-.styled-table tbody tr:last-of-type {
-    border-bottom: 2px solid #007bff;
-}
-
-/* Responsive adjustments for tables to ensure grade input looks good */
-@media (max-width: 768px) {
-    .grade-form {
-        flex-direction: column; /* Stack input and button vertically on smaller screens */
-        gap: 5px;
-    }
-    .grade-input {
-        width: 100%; /* Make input full width when stacked */
-        max-width: 100px; /* Optional: limit max width if it gets too wide */
-    }
+.mb-20 {
+    margin-bottom: 20px;
 }

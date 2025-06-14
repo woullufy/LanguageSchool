@@ -1,25 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ student_name }}'s Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
-    </head>
+</head>
+
 <body class="{% if db_mode %}{{ db_mode }}-background{% else %}neutral-background{% endif %}">
     <div class="student-dashboard-container">
         <h1>Welcome, {{ student_name }}!</h1>
         <p class="student-id-display">Student ID: {{ student_id }}</p>
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
 
         <div class="action-grid">
             <div class="action-card submit-sql">
@@ -41,11 +31,11 @@
                 <h3>Register for a Group</h3>
                 <p>Enroll in new language groups and manage your course schedule (SQL).</p>
                 <form action="{{ url_for('student_management.select_course', student_id=student_id) }}" method="get">
-                    <button type="submit" >Choose Group</button>
-                </form>    
+                    <button type="submit">Choose Group</button>
+                </form>
             </div>
 
-            </div>
+        </div>
 
         <div class="back-to-main-menu">
             <form action="{{ url_for('main.index') }}" method="get">
@@ -54,4 +44,5 @@
         </div>
     </div>
 </body>
+
 </html>

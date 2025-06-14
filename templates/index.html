@@ -2,28 +2,15 @@
 <html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Language School Portal</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
-    </head>
+</head>
 
 <body>
     <h1 class="main-title">📚 Language School Platform</h1>
     <p class="select-role-description">Select your role below to begin:</p>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="flash-messages">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
-
     <div class="dashboard-grid-container">
-
         <div class="role-card student">
             <span class="icon">🎓</span>
             <h2>Student</h2>
@@ -46,18 +33,17 @@
             <span class="icon">👩‍💻</span>
             <h2>Administrator</h2>
             <p>Manage database, users, and generate comprehensive reports.</p>
-            <form action="{{ url_for('main.admin_dashboard') }}" method="get">
-                 <button type="submit">Enter as Admin</button>
+            <form action="{{ url_for('main.dashboard_admin') }}" method="get">
+                <button type="submit">Enter as Admin</button>
             </form>
         </div>
-        
+
         <!-- <div class="role-card tutor">
             <span class="icon">🗣️</span>
             <h2>Tutor</h2>
             <p>Future features for managing courses and student progress.</p>
             <button type="button" disabled>Coming Soon</button>
-        </div> -->
-
+        </div> -->s
     </div>
 
 </body>

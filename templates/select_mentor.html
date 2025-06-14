@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select Mentor</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
 </head>
@@ -14,7 +12,7 @@
         <h2>Select Your Mentor Account</h2>
         <p>Please select your mentor ID to proceed to your dashboard.</p>
 
-        <form action="{{ url_for('assignments.mentor_dashboard') }}" method="post">
+        <form action="{{ url_for('assignments.dashboard_mentor') }}" method="post">
             <label for="mentor_id">Select Mentor:</label>
             <select name="mentor_id" id="mentor_id" required>
                 <option value="">-- Please Select a Mentor --</option>

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, session
 from db_connections import get_mysql_connection, get_mongo_connection
 from datetime import datetime
 
@@ -15,7 +15,7 @@ def select_student_landing():
 
 
 @assignments_bp.route("/student-dashboard", methods=["GET", "POST"])
-def student_dashboard():
+def dashboard_student():
     db_mode = session.get("active_db_mode", "sql")
 
     if request.method == "POST":
@@ -28,7 +28,7 @@ def student_dashboard():
         student_name = session.get("current_student_name", "Student")
 
     return render_template(
-        "student_dashboard.html",
+        "dashboard_student.html",
         student_id=student_id,
         student_name=student_name,
         db_mode=db_mode,
@@ -44,7 +44,7 @@ def select_mentor_landing():
 
 
 @assignments_bp.route("/mentor-dashboard", methods=["GET", "POST"])
-def mentor_dashboard():
+def dashboard_mentor():
     db_mode = session.get("active_db_mode", "sql")
 
     if request.method == "POST":
@@ -57,7 +57,7 @@ def mentor_dashboard():
         mentor_name = session.get("current_mentor_name", "Mentor")
 
     return render_template(
-        "mentor_dashboard.html",
+        "dashboard_mentor.html",
         mentor_id=mentor_id,
         mentor_name=mentor_name,
         db_mode=db_mode,
@@ -274,7 +274,6 @@ def grade_assignments_nosql_for_mentor(mentor_id):
         assignment_id = request.form["assignment_id"]
         student_id = request.form["student_id"]
 
-
         grade = int(request.form["grade"])
         checked_date = datetime.now().strftime("%Y-%m-%d")
 
@@ -288,7 +287,6 @@ def grade_assignments_nosql_for_mentor(mentor_id):
             },
         )
 
-        flash("Assignment graded successfully!", "success")
         return redirect(
             url_for(
                 "assignments.grade_assignments_nosql_for_mentor",

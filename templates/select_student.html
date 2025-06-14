@@ -1,27 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select Student Account</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
 </head>
+
 <body class="{% if db_mode %}{{ db_mode }}-background{% else %}neutral-background{% endif %}">
     <div class="selection-container">
         <h2>Who are you? Please Select Your Student Account</h2>
 
-        <form action="{{ url_for('assignments.student_dashboard') }}" method="post">
+        <form action="{{ url_for('assignments.dashboard_student') }}" method="post">
             <label for="student_id">Choose a student:</label>
             <select name="student_id" id="student_id" required>
                 {% if students %}
-                    <option value="">-- Select your student account --</option>
-                    {% for student in students %}
-                        <option value="{{ student.student_id }}">
-                            {{ student.first_name }} {{ student.last_name }} (ID: {{ student.student_id }})
-                        </option>
-                    {% endfor %}
+                <option value="">-- Select your student account --</option>
+                {% for student in students %}
+                <option value="{{ student.student_id }}">
+                    {{ student.first_name }} {{ student.last_name }} (ID: {{ student.student_id }})
+                </option>
+                {% endfor %}
                 {% else %}
-                    <option value="" disabled>No students found. Please generate data first.</option>
+                <option value="" disabled>No students found. Please generate data first.</option>
                 {% endif %}
             </select>
             <button type="submit">Go to My Dashboard</button>
@@ -34,4 +34,5 @@
         </div>
     </div>
 </body>
+
 </html>
