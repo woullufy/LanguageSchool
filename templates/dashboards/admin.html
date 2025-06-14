@@ -2,8 +2,6 @@
 <html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administrator Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
 </head>
@@ -56,7 +54,7 @@
             </div>
         </div>
 
-        <div class="admin-section reports">
+        <!-- <div class="admin-section reports">
             <h2>Reports</h2>
             <div class="button-grid">
                 <form action="{{ url_for('reports.average_age_report') }}" method="get">
@@ -73,6 +71,37 @@
                 </form>
 
             </div>
+        </div> -->
+
+        <div class="admin-section reports">
+            <h2>Reports</h2>
+
+            <div class="report-category">
+                <h3>Student Demographics</h3>
+                <p>Reports related to student information and characteristics.</p>
+                <div class="button-grid">
+                    <form action="{{ url_for('reports.average_age_report') }}" method="get">
+                        <button type="submit">📊 Average Age Report (SQL)</button>
+                    </form>
+                    <form action="{{ url_for('reports.avg_age_report_nosql') }}" method="get">
+                        <button type="submit">📈 Average Age Report (NoSQL)</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="report-category">
+                <h3>Assignment & Grading Overview</h3>
+                <p>Reports on assignment submissions and grading progress.</p>
+                <div class="button-grid">
+                    <form action="{{ url_for('reports.sql_graded_report') }}" method="get">
+                        <button type="submit">📈 Graded Assignments (SQL)</button>
+                    </form>
+                    <form action="{{ url_for('reports.nosql_graded_report') }}" method="get">
+                        <button type="submit">📊 Graded Assignments (NoSQL)</button>
+                    </form>
+                </div>
+            </div>
+
         </div>
 
         <div class="back-to-main-menu">

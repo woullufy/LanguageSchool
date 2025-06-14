@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>All Database Tables</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
+</head>
+
+<body class="{% if db_type %}{{ db_type }}-background{% else %}neutral-background{% endif %}">
+
+    <div class="container">
+        <h1>Database Tables Overview</h1>
+
+        <form action="/" method="get">
+            <button type="submit" class="button button-secondary">Back to Main Menu</button>
+        </form>
+
+        {% for table, content in data.items() %}
+        <div class="dashboard-section">
+            <h2>{{ table | replace('_', ' ') | capitalize }}</h2>
+            <table class="styled-table data-table">
+                <thead>
+                    <tr>
+                        {% for col in content.columns %}
+                        <th>{{ col | replace('_', ' ') | capitalize }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row_dict in content.rows %}
+                    <tr>
+                        {% for col_name in content.columns %}
+                        <td data-label="{{ col_name | replace('_', ' ') | capitalize }}">
+                            {{ row_dict[col_name] }}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
+    </div>
+
+</body>
+
+</html>

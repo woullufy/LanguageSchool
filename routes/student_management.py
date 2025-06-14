@@ -16,7 +16,11 @@ def select_course(student_id):
         course_id = request.form["course_id"]
         student_id = request.form["student_id"]
         return redirect(
-            url_for("student_management.course_groups", course_id=course_id, student_id=student_id)
+            url_for(
+                "student_management.course_groups",
+                course_id=course_id,
+                student_id=student_id,
+            )
         )
 
     return render_template("select_course.html", courses=courses, student_id=student_id)
@@ -32,12 +36,16 @@ def select_student():
 
     if request.method == "POST":
         student_id = request.form["student_id"]
-        return redirect(url_for("student_management.select_course", student_id=student_id))
+        return redirect(
+            url_for("student_management.select_course", student_id=student_id)
+        )
 
     return render_template("select_student.html", students=students)
 
 
-@student_management_bp.route("/course-groups/<course_id>/<student_id>", methods=["GET", "POST"])
+@student_management_bp.route(
+    "/course-groups/<course_id>/<student_id>", methods=["GET", "POST"]
+)
 def course_groups(course_id, student_id):
     conn = get_mysql_connection()
     cursor = conn.cursor(dictionary=True)
@@ -87,7 +95,11 @@ def join_group():
     if amount_of_participants >= max_participants:
         flash("❌ Cannot join: group is full.")
         return redirect(
-            url_for("student_management.course_groups", course_id=course_id, student_id=student_id)
+            url_for(
+                "student_management.course_groups",
+                course_id=course_id,
+                student_id=student_id,
+            )
         )
 
     cursor.execute("SELECT age FROM student WHERE student_id = %s", (student_id,))
@@ -96,7 +108,11 @@ def join_group():
     if not check_age(age_category, student_age):
         flash("❌ Cannot join: it is not you age category.")
         return redirect(
-            url_for("student_management.course_groups", course_id=course_id, student_id=student_id)
+            url_for(
+                "student_management.course_groups",
+                course_id=course_id,
+                student_id=student_id,
+            )
         )
 
     cursor.execute(
@@ -115,7 +131,11 @@ def join_group():
     conn.close()
 
     return redirect(
-        url_for("student_management.course_groups", course_id=course_id, student_id=student_id)
+        url_for(
+            "student_management.course_groups",
+            course_id=course_id,
+            student_id=student_id,
+        )
     )
 
 

@@ -48,7 +48,7 @@ def sql_graded_report():
     conn.close()
 
     return render_template(
-        "report_graded_assignments.html",
+        "reports/graded_assignments.html",
         results=results,
         threshold=threshold,
         mode=mode,
@@ -107,7 +107,7 @@ def nosql_graded_report():
     results = list(students_col.aggregate(pipeline))
 
     return render_template(
-        "report_graded_assignments.html",
+        "reports/graded_assignments.html",
         results=results,
         threshold=threshold,
         mode=mode,
@@ -132,7 +132,7 @@ def average_age_report():
         """
     )
     reports = cursor.fetchall()
-    return render_template("report_average_age.html", reports=reports)
+    return render_template("reports/average_age.html", reports=reports)
 
 
 @reports_bp.route("/avg-age-report-nosql")
@@ -172,4 +172,4 @@ def avg_age_report_nosql():
     ]
     report = list(db["courses"].aggregate(pipeline))
 
-    return render_template("report_average_age.html", reports=report)
+    return render_template("reports/average_age.html", reports=report)

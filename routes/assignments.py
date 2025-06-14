@@ -28,7 +28,7 @@ def dashboard_student():
         student_name = session.get("current_student_name", "Student")
 
     return render_template(
-        "dashboard_student.html",
+        "dashboards/student.html",
         student_id=student_id,
         student_name=student_name,
         db_mode=db_mode,
@@ -57,7 +57,7 @@ def dashboard_mentor():
         mentor_name = session.get("current_mentor_name", "Mentor")
 
     return render_template(
-        "dashboard_mentor.html",
+        "dashboards/mentor.html",
         mentor_id=mentor_id,
         mentor_name=mentor_name,
         db_mode=db_mode,
