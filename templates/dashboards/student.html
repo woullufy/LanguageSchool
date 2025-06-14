@@ -30,14 +30,13 @@
                 <span class="icon">📚</span>
                 <h3>Register for a Group</h3>
                 <p>Enroll in new language groups and manage your course schedule (SQL).</p>
-                <form action="{{ url_for('student_management.select_course', student_id=student_id) }}" method="get">
-                    <form action="{{ 
+                <form action="{{ 
                     url_for('student_management.select_course', student_id=student_id) 
                     if db_mode == 'sql' else 
-                    url_for('student_management_nosql.student_management', student_id=student_id) 
+                    url_for('student_management_mongo.select_course', student_id=student_id) 
                 }}" method="get">
-                        <button type="submit">Choose Group</button>
-                    </form>
+                    <button type="submit">Choose Group</button>
+                </form>
             </div>
 
         </div>

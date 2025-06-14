@@ -1,39 +1,55 @@
+<!DOCTYPE html>
+<html>
+
 <head>
     <title>Select Course</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
 </head>
 
-<body>
-    <h1>Select a Course</h1>
+<body class="{% if db_mode %}{{ db_mode }}-background{% else %}neutral-background{% endif %}">
 
-    <form action="/" method="get">
-        <button type="submit" class="submit-button">← Back to Courses</button>
-    </form>
+    <div class="container">
+        <h1 class="page-header">
+            📚 Select a Course
+        </h1>
 
-    <table class="styled-table">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Language</th>
-                <th>Level</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for course in courses %}
-            <tr>
-                <td>{{ course.title }}</td>
-                <td>{{ course.language }}</td>
-                <td>{{ course.level }}</td>
-                <td>
-                    <form method="POST" action="/select-course/{{ student_id }}">
-                        <input type="hidden" name="course_id" value="{{ course.course_id }}">
-                        <input type="hidden" name="title" value="{{ course.title }}">
-                        <input type="hidden" name="student_id" value="{{student_id}}">
-                        <button type="submit" class="submit-button">Select</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <div class="back-button">
+            <form action="/" method="get">
+                <button type="submit" class="button button-secondary">← Back to Courses</button>
+            </form>
+        </div>
+
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Language</th>
+                    <th>Level</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                <tr>
+                    <td>{{ course.title }}</td>
+                    <td>{{ course.language }}</td>
+                    <td>{{ course.level }}</td>
+                    <td>
+                        <form method="POST"
+                            action="{% if db_mode == 'nosql' %}{{ url_for('student_management_mongo.select_course', student_id=student_id) }}{% else %}{{ url_for('student_management.select_course', student_id=student_id) }}{% endif %}">
+
+                            <input type="hidden" name="course_id" value="{{ course.course_id }}">
+                            <input type="hidden" name="title" value="{{ course.title }}">
+                            <input type="hidden" name="student_id" value="{{ student_id }}">
+                            <button type="submit" class="button button-primary button-small">Select</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 </body>
+
+</html>

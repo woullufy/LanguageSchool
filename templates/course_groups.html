@@ -7,16 +7,10 @@
 
     <h1>👥 Groups for {{ title }}</h1>
 
-    <form action="/select-course/{{ student_id }}" method="get">
+    <form method="get"
+        action="{% if db_mode == 'nosql' %}{{ url_for('student_management_mongo.select_course', student_id=student_id) }}{% else %}{{ url_for('student_management.select_course', student_id=student_id) }}{% endif %}">
         <button type="submit" class="submit-button">← Back to Courses</button>
     </form>
-    {% with messages = get_flashed_messages()%}
-    {% if messages%}
-    {% for message in messages%}
-    <p>{{message}}</p>
-    {%endfor%}
-    {%endif%}
-    {%endwith%}
 
     <table class="styled-table">
         <thead>
@@ -34,12 +28,21 @@
                 <td>{{ group.student_group_id }}</td>
                 <td>{{ group.age_category }}</td>
                 <td>{{ group.max_participants }}</td>
-                <td>{{ group.amount_of_participants }}</td>
+                <td>
+                    {% if group.amount_of_participants is defined %}
+                    {{ group.amount_of_participants }}
+                    {% elif group.students is defined %}
+                    {{ group.students | length }}
+                    {% else %}
+                    N/A
+                    {% endif %}
+                </td>
                 <td>
                     {% if group.student_group_id in joined_ids %}
                     <button type="button" disabled class="done-button">✅ Done</button>
                     {% else %}
-                    <form method="POST" action="/join-group">
+                    <form method="POST"
+                        action="{% if db_mode == 'nosql' %}{{ url_for('student_management_mongo.join_group', student_id=student_id) }}{% else %}{{ url_for('student_management.join_group', student_id=student_id) }}{% endif %}">
                         <input type="hidden" name="student_group_id" value="{{ group.student_group_id }}">
                         <input type="hidden" name="course_id" value="{{ group.course_id }}">
                         <input type="hidden" name="student_id" value="{{ student_id }}">

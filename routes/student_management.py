@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from db_connections import get_mysql_connection
 
 student_management_bp = Blueprint("student_management", __name__)
@@ -12,6 +12,9 @@ def select_course(student_id):
     courses = cursor.fetchall()
     cursor.close()
     conn.close()
+
+    db_mode = session.get("active_db_mode", "sql")
+
     if request.method == "POST":
         course_id = request.form["course_id"]
         student_id = request.form["student_id"]
@@ -23,36 +26,18 @@ def select_course(student_id):
             )
         )
 
-    # return render_template("select_course.html", courses=courses, student_id=student_id)
     return render_template(
-        "select_course.html", courses=courses, student_id=student_id, db_mode="sql", 
-        back_url=url_for("student_management.select_student"),
-        select_action=url_for("student_management.select_course", student_id=student_id),
+        "select_course.html", courses=courses, student_id=student_id, db_mode=db_mode
     )
 
 
-
-@student_management_bp.route("/select-student", methods=["GET", "POST"])
-def select_student():
-    conn = get_mysql_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT student_id, first_name, last_name FROM student")
-    students = cursor.fetchall()
-    conn.close()
-
-    if request.method == "POST":
-        student_id = request.form["student_id"]
-        return redirect(
-            url_for("student_management.select_course", student_id=student_id)
-        )
-
-    return render_template("select_student.html", students=students)
-
-
-@student_management_bp.route("/course-groups/<course_id>/<student_id>", methods=["GET", "POST"])
+@student_management_bp.route(
+    "/course-groups/<course_id>/<student_id>", methods=["GET", "POST"]
+)
 def course_groups(course_id, student_id):
     conn = get_mysql_connection()
     cursor = conn.cursor(dictionary=True)
+    db_mode = session.get("active_db_mode", "sql")
 
     cursor.execute("SELECT * FROM student_group WHERE course_id = %s", (course_id,))
     groups = cursor.fetchall()
@@ -77,6 +62,7 @@ def course_groups(course_id, student_id):
         title=title,
         student_id=student_id,
         joined_ids=joined_ids,
+        db_mode=db_mode,
     )
 
 

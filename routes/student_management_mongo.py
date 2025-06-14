@@ -1,32 +1,17 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from db_connections import get_mongo_connection
 
 student_management_mongo_bp = Blueprint("student_management_mongo", __name__)
 
 
-@student_management_mongo_bp.route("/select-student-mongo", methods=["GET", "POST"])
-def select_student():
-    db = get_mongo_connection()
-    student_collection = db["students"]
-    students = student_collection.find(
-        {}, {"student_id": 1, "first_name": 1, "last_name": 1, "_id": 0}
-    )
-
-    if request.method == "POST":
-        student_id = request.form["student_id"]
-        return redirect(
-            url_for("student_management_mongo.select_course", student_id=student_id)
-        )
-
-    return render_template("select_student.html", students=students)
-
-
 @student_management_mongo_bp.route(
     "/select-course-mongo/<student_id>", methods=["GET", "POST"]
 )
-def select_course_nosql(student_id):
+def select_course(student_id):
     db = get_mongo_connection()
     courses = db["courses"].find()
+
+    db_mode = session.get("active_db_mode", "sql")
 
     if request.method == "POST":
         course_id = request.form["course_id"]
@@ -38,10 +23,9 @@ def select_course_nosql(student_id):
                 student_id=student_id,
             )
         )
+
     return render_template(
-        "select_course.html", courses=courses, student_id=student_id, db_mode="nosql",
-        back_url=url_for("student_management_nosql.select_student"),
-        select_action=url_for("student_management_nosql.select_course_nosql", student_id=student_id),
+        "select_course.html", courses=courses, student_id=student_id, db_mode=db_mode
     )
 
 
@@ -55,13 +39,18 @@ def course_groups(course_id, student_id):
     )
     groups = course["student_group"] if course else []
     title = course["title"]
+    
+    print(groups)
+
+    db_mode = session.get("active_db_mode", "sql")
 
     return render_template(
-        "course_groups_mongo.html",
+        "course_groups.html",
         groups=groups,
         title=title,
         student_id=student_id,
         course_id=course_id,
+        db_mode=db_mode,
     )
 
 

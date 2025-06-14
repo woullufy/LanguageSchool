@@ -48,7 +48,7 @@ def migrate_courses():
             group_doc = {
                 "student_group_id": g["student_group_id"],
                 "age_category": g["age_category"],
-                "max_participant": g["max_participants"],
+                "max_participants": g["max_participants"],
                 "students": students_by_group.get(group_key, []),
             }
             course_doc["student_group"].append(group_doc)
