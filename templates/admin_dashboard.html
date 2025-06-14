@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrator Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
+</head>
+<body>
+    <div class="admin-dashboard-container">
+        <h1>Administrator Dashboard</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="admin-section db-mode-selector">
+            <h2><span class="icon">⚙️</span> Application Database Mode</h2>
+            <p>Current Active Mode: <strong>
+                {% if current_db_mode == 'sql' %}
+                    SQL (MariaDB)
+                {% elif current_db_mode == 'nosql' %}
+                    NoSQL (MongoDB)
+                {% else %}
+                    Not Set (Defaulting to SQL)
+                {% endif %}
+            </strong></p>
+            <p>Select which database type the application should primarily interact with:</p>
+            <form action="{{ url_for('main.set_db_mode') }}" method="post" class="db-mode-form">
+                <button type="submit" name="db_mode" value="sql"
+                    {% if current_db_mode == 'sql' %}class="active-mode"{% endif %}>
+                    Use SQL (MariaDB)
+                </button>
+                <button type="submit" name="db_mode" value="nosql"
+                    {% if current_db_mode == 'nosql' %}class="active-mode"{% endif %}>
+                    Use NoSQL (MongoDB)
+                </button>
+            </form>
+        </div>
+
+        <div class="admin-section db-management">
+            <h2>Database Management</h2>
+            <div class="button-grid">
+                <form action="{{ url_for('main.generate_data') }}" method="get">
+                    <button type="submit">🔄 Generate Fake Data</button>
+                </form>
+                <form action="{{ url_for('main.show_tables') }}" method="get">
+                    <button type="submit">📋 View RDBMS Tables</button>
+                </form>
+                <form action="{{ url_for('main.migrate_all_route') }}" method="get">
+                    <button type="submit">⬇️ Migrate SQL to NoSQL</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="admin-section nosql-views">
+            <h2>NoSQL Data Views</h2>
+            <div class="button-grid">
+                <form action="{{ url_for('main.show_tables_courses') }}" method="get">
+                    <button type="submit">View Courses (NoSQL)</button>
+                </form>
+                <form action="{{ url_for('main.show_tables_students') }}" method="get">
+                    <button type="submit">View Students (NoSQL)</button>
+                </form>
+                <form action="{{ url_for('main.show_tables_employees') }}" method="get">
+                    <button type="submit">View Employees (NoSQL)</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="admin-section reports">
+            <h2>Reports</h2>
+            <div class="button-grid">
+                <form action="{{ url_for('reports.average_age_report') }}" method="get">
+                    <button type="submit">📊 Avg. Age Report (SQL)</button>
+                </form>
+                <form action="{{ url_for('reports.graded_report') }}" method="get">
+                    <button type="submit">📈 Graded Report (SQL)</button>
+                </form>
+                <form action="{{ url_for('reports.nosql_high_performers') }}" method="get">
+                    <button type="submit">📊 High Performers (NoSQL)</button>
+                </form>
+                <form action="{{ url_for('reports.avg_age_report_nosql') }}" method="get">
+                    <button type="submit">📈 Avg. Age Report (NoSQL)</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="back-to-main-menu">
+            <form action="{{ url_for('main.index') }}" method="get">
+                <button type="submit">Back to Main Menu</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -2,88 +2,62 @@
 <html>
 
 <head>
-    <title>Language School Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language School Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
+    </head>
 
 <body>
+    <h1 class="main-title">📚 Language School Platform</h1>
+    <p class="select-role-description">Select your role below to begin:</p>
 
-    <h1>📚 Language School Platform</h1>
-    <p>Select your role below to begin:</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
 
-    <div class="dashboard">
+    <div class="dashboard-grid-container">
 
-        <div class="role-card">
-            <h2>🎓 Student</h2>
-            <form action="/submit-assignment" method="get">
-                <button type="submit">Submit Assignment</button>
-            </form>
-            <form action="/submit_assignment_nosql" method="get">
-                <button type="submit">Submit Assignment (NoSQL)</button>
-            </form>
-
-            <form action="/select-student" method="get">
-                <button type="submit">Select Group</button>
-            </form>
-            <form action="/select-student-mongo" method="get">
-                <button type="submit">Select Group (NoSQL)</button>
+        <div class="role-card student">
+            <span class="icon">🎓</span>
+            <h2>Student</h2>
+            <p>Access your assignments and manage your group registrations.</p>
+            <form action="{{ url_for('assignments.select_student_landing') }}" method="get">
+                <button type="submit">Enter as Student</button>
             </form>
         </div>
 
-
-        <div class="role-card">
-            <h2>🧑‍🏫 Mentor</h2>
-            <form action="/grade-assignment" method="get">
-                <button type="submit">Grade Assignments</button>
-            </form>
-            <form action="/grade_assignment_nosql" method="get">
-                <button type="submit">Grade Assignments (NoSQL)</button>
+        <div class="role-card mentor">
+            <span class="icon">🧑‍🏫</span>
+            <h2>Mentor</h2>
+            <p>Review and grade student assignments.</p>
+            <form action="{{ url_for('assignments.select_mentor_landing') }}" method="get">
+                <button type="submit">Enter as Mentor</button>
             </form>
         </div>
 
-
-        <div class="role-card">
-            <h2>🗣️ Tutor</h2>
-            <p>No tutor-specific features yet.</p>
-        </div>
-
-
-        <div class="role-card">
-            <h2>👩‍💻 Developer Tools</h2>
-            <form action="/generate-data" method="get">
-                <button type="submit">🔄 Generate Fake Data</button>
-            </form>
-            <form action="/tables" method="get">
-                <button type="submit">📋 View All Tables</button>
-            </form>
-            <form action="/migrate" method="get">
-                <button type="submit">⬇️ Migrate to MongoDB</button>
-            </form>
-            <hr>
-            <form action="/tables_mongo_courses" method="get">
-                <button type="submit">⬇️ Show Tables Courses</button>
-            </form>
-            <form action="/tables_mongo_students" method="get">
-                <button type="submit">⬇️ Show Tables Students</button>
-            </form>
-            <form action="/tables_mongo_employees" method="get">
-                <button type="submit">⬇️ Show Tables Employees</button>
-            </form>
-            <hr>
-            <form action="/average-age-report" method="get">
-                <button type="submit">📊 Avg. Age Report (SQL)</button>
-            </form>
-
-            <form action="/graded-report" method="get">
-                <button type="submit">📈 Graded Report (SQL)</button>
-            </form>
-            <form action="/nosql-high-performers" method="get">
-                <button type="submit">📊 High Performers (NoSQL)</button>
-            </form>
-            <form action="/avg-age-report-nosql" method="get">
-                <button type="submit"> 📈 Avg. Age Report (NoSQL)</button>
+        <div class="role-card admin">
+            <span class="icon">👩‍💻</span>
+            <h2>Administrator</h2>
+            <p>Manage database, users, and generate comprehensive reports.</p>
+            <form action="{{ url_for('main.admin_dashboard') }}" method="get">
+                 <button type="submit">Enter as Admin</button>
             </form>
         </div>
+        
+        <!-- <div class="role-card tutor">
+            <span class="icon">🗣️</span>
+            <h2>Tutor</h2>
+            <p>Future features for managing courses and student progress.</p>
+            <button type="button" disabled>Coming Soon</button>
+        </div> -->
+
     </div>
 
 </body>

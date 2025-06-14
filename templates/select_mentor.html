@@ -1,10 +1,34 @@
-<h2>Select Mentor</h2>
-<form method="POST">
-  <label for="mentor_id">Mentor:</label>
-  <select name="mentor_id" required>
-    {% for m in mentors %}
-      <option value="{{ m.mentor_id }}">{{ m.mentor_id }}</option>
-    {% endfor %}
-  </select>
-  <button type="submit">View Assignments</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Mentor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
+</head>
+<body>
+    <div class="selection-container">
+        <h2>Select Your Mentor Account</h2>
+        <p>Please select your mentor ID to proceed to your dashboard.</p>
+
+        <form action="{{ url_for('assignments.mentor_dashboard') }}" method="post">
+            <label for="mentor_id">Select Mentor:</label>
+            <select name="mentor_id" id="mentor_id" required>
+                <option value="">-- Please Select a Mentor --</option>
+                {% for mentor in mentors %}
+                    <option value="{{ mentor.mentor_id }}">
+                        {{ mentor.first_name }} {{ mentor.last_name }} ({{ mentor.mentor_id }})
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit">Proceed to Mentor Dashboard</button>
+        </form>
+
+        <div class="back-to-main-menu">
+            <form action="{{ url_for('main.index') }}" method="get">
+                <button type="submit">Back to Main Menu</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

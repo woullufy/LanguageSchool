@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ student_name }}'s Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
+    </head>
+<body>
+    <div class="student-dashboard-container">
+        <h1>Welcome, {{ student_name }}!</h1>
+        <p class="student-id-display">Student ID: {{ student_id }}</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="action-grid">
+            <div class="action-card submit-sql">
+                <span class="icon">📝</span>
+                <h3>View & Submit Assignments</h3>
+                <p>Access your current assignments and submit your completed work (SQL).</p>
+                <form action="{{ 
+                    url_for('assignments.submit_assignment_for_student', student_id=student_id) 
+                    if db_mode == 'sql' else 
+                    url_for('assignments.submit_assignment_nosql_for_student', student_id=student_id) 
+                }}" method="get">
+                    <button type="submit">Go to Assignments</button>
+                </form>
+
+            </div>
+
+            <div class="action-card submit-sql">
+                <span class="icon">📚</span>
+                <h3>Register for a Group</h3>
+                <p>Enroll in new language groups and manage your course schedule (SQL).</p>
+                <form action="{{ url_for('student_management.select_course', student_id=student_id) }}" method="get">
+                    <button type="submit" >Choose Group</button>
+                </form>    
+            </div>
+
+            </div>
+
+        <div class="back-to-main-menu">
+            <form action="{{ url_for('main.index') }}" method="get">
+                <button type="submit">Logout / Back to Main Menu</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -4,8 +4,10 @@
 # Python virtual environment folders
 venv/
 __pycache__/
+.venv
 
 # OS and editor system files
 .DS_Store
 Thumbs.db
 docker/mongo-data
+

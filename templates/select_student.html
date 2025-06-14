@@ -1,14 +1,37 @@
-<h2>Select Student</h2>
-<form action="/" method="get">
-  <button type="submit" , class="submit-button">Home</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Student Account</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
+</head>
+<body>
+    <div class="selection-container">
+        <h2>Who are you? Please Select Your Student Account</h2>
 
-<form method="POST">
-  <label for="student_id">Student:</label>
-  <select name="student_id" required>
-    {% for student in students %}
-    <option value="{{ student.student_id }}">{{ student.first_name }} {{ student.last_name }}</option>
-    {% endfor %}
-  </select>
-  <button type="submit">Next</button>
-</form>
+        <form action="{{ url_for('assignments.student_dashboard') }}" method="post">
+            <label for="student_id">Choose a student:</label>
+            <select name="student_id" id="student_id" required>
+                {% if students %}
+                    <option value="">-- Select your student account --</option>
+                    {% for student in students %}
+                        <option value="{{ student.student_id }}">
+                            {{ student.first_name }} {{ student.last_name }} (ID: {{ student.student_id }})
+                        </option>
+                    {% endfor %}
+                {% else %}
+                    <option value="" disabled>No students found. Please generate data first.</option>
+                {% endif %}
+            </select>
+            <button type="submit">Go to My Dashboard</button>
+        </form>
+
+        <div class="back-button-container">
+            <form action="{{ url_for('main.index') }}" method="get">
+                <button type="submit" style="background-color: #dc3545;">Back to Main Menu</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

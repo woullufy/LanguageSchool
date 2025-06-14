@@ -1,31 +1,72 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from db_connections import get_mysql_connection, get_mongo_connection
 from datetime import datetime
-from pymongo import ASCENDING, DESCENDING
+from pymongo import ASCENDING
 
 assignments_bp = Blueprint("assignments", __name__)
 
-#### **SQL Assignment Management**
 
-
-# ─── Assignment Submission ───────────────────────────────
-@assignments_bp.route("/submit-assignment", methods=["GET", "POST"])
-def submit_assignment_select_student():
-    conn = get_mysql_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT student_id, first_name, last_name FROM student")
-    students = cursor.fetchall()
-    conn.close()
-
-    if request.method == "POST":
-        student_id = request.form["student_id"]
-        return redirect(
-            url_for("assignments.submit_assignment_for_student", student_id=student_id)
-        )
-
+# ──────────── Navigation ────────────
+#### Student selection part 
+@assignments_bp.route("/select-student", methods=["GET"])
+def select_student_landing():
+    db_mode = session.get('active_db_mode', 'sql')
+    students = get_students_nosql() if db_mode == 'nosql' else get_students_sql()
     return render_template("select_student.html", students=students)
 
+@assignments_bp.route("/student-dashboard", methods=["GET", "POST"])
+def student_dashboard():
+    db_mode = session.get('active_db_mode', 'sql')
 
+    if request.method == "POST":
+        student_id = request.form.get("student_id")
+        student_name = get_student_name(student_id, db_mode)
+        session['current_student_id'] = student_id
+        session['current_student_name'] = student_name
+    else:
+        student_id = session.get('current_student_id')
+        student_name = session.get('current_student_name', 'Student')
+
+    return render_template(
+        "student_dashboard.html",
+        student_id=student_id,
+        student_name=student_name,
+        db_mode=db_mode
+    )
+
+
+#### Mentor selection part 
+@assignments_bp.route("/select-mentor", methods=["GET"])
+def select_mentor_landing():
+    db_mode = session.get('active_db_mode', 'sql')
+    mentors = get_mentors_nosql() if db_mode == 'nosql' else get_mentors_sql()
+    return render_template("select_mentor.html", mentors=mentors)
+
+
+@assignments_bp.route("/mentor-dashboard", methods=["GET", "POST"])
+def mentor_dashboard():
+    db_mode = session.get('active_db_mode', 'sql')
+
+    if request.method == "POST":
+        mentor_id = request.form.get("mentor_id")
+        mentor_name = get_mentor_name(mentor_id, db_mode)
+        session['current_mentor_id'] = mentor_id
+        session['current_mentor_name'] = mentor_name
+    else:
+        mentor_id = session.get('current_mentor_id')
+        mentor_name = session.get('current_mentor_name', 'Mentor')
+
+    return render_template(
+        "mentor_dashboard.html",
+        mentor_id=mentor_id,
+        mentor_name=mentor_name,
+        db_mode=db_mode
+    )
+
+
+
+# ──────────── Use case ────────────
+#### Submit assignment
 @assignments_bp.route("/submit-assignment/<student_id>", methods=["GET", "POST"])
 def submit_assignment_for_student(student_id):
     conn = get_mysql_connection()
@@ -70,102 +111,6 @@ def submit_assignment_for_student(student_id):
         assignments=assignments,
         now=datetime.now(),
     )
-
-
-# ─── Assignment Grading ───────────────────────────────
-@assignments_bp.route("/grade-assignment", methods=["GET", "POST"])
-def select_mentor():
-    conn = get_mysql_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT mentor_id FROM mentor")
-    mentors = cursor.fetchall()
-    conn.close()
-
-    if request.method == "POST":
-        mentor_id = request.form["mentor_id"]
-        return redirect(url_for("assignments.grade_assignment", mentor_id=mentor_id))
-
-    return render_template("select_mentor.html", mentors=mentors)
-
-
-@assignments_bp.route("/grade-assignment/<mentor_id>", methods=["GET", "POST"])
-def grade_assignment(mentor_id):
-    conn = get_mysql_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    # Get students supervised by this mentor
-    cursor.execute(
-        """
-        SELECT student_id, first_name, last_name
-        FROM student
-        WHERE mentor = %s
-    """,
-        (mentor_id,),
-    )
-    students = cursor.fetchall()
-
-    # Get assignments from those students that have been submitted
-    cursor.execute(
-        """
-        SELECT a.assignment_id, a.from_student, s.first_name, s.last_name, a.submission_date
-        FROM assignment a
-        JOIN student s ON a.from_student = s.student_id
-        WHERE s.mentor = %s AND a.submission_date IS NOT NULL
-          AND a.assignment_id NOT IN (SELECT assignment_id FROM checked_assignments)
-    """,
-        (mentor_id,),
-    )
-    assignments = cursor.fetchall()
-
-    if request.method == "POST":
-        # assignment_id = request.form["assignment_id"]
-        raw_assignment_id = request.form["assignment_id"]
-        assignment_id = raw_assignment_id.split("::")[0]  # handles both "AS0001" and "AS0001::ST0001"
-
-        grade = int(request.form["grade"])
-        checked_date = datetime.now()
-
-        cursor.execute(
-            """
-            INSERT INTO checked_assignments (assignment_id, mentor_id, grade, checked_date)
-            VALUES (%s, %s, %s, %s)
-        """,
-            (assignment_id, mentor_id, grade, checked_date),
-        )
-
-        conn.commit()
-        conn.close()
-        return redirect("/tables")
-
-    conn.close()
-    return render_template(
-        "grade_assignment.html", assignments=assignments, mentor_id=mentor_id
-    )
-
-
-#### **NoSQL Assignment Management**
-
-
-# ─── Assignment Submission ───────────────────────────────
-@assignments_bp.route("/submit_assignment_nosql", methods=["GET", "POST"])
-def submit_assignment_nosql_select_student():
-    db = get_mongo_connection()
-    students_col = db["students"]
-    students = list(
-        students_col.find(
-            {}, {"student_id": 1, "first_name": 1, "last_name": 1, "_id": 0}
-        )
-    )
-
-    if request.method == "POST":
-        student_id = request.form["student_id"]
-        return redirect(
-            url_for(
-                "assignments.submit_assignment_nosql_for_student", student_id=student_id
-            )
-        )
-
-    return render_template("select_student.html", students=students)
 
 
 @assignments_bp.route("/submit-assignment-nosql/<student_id>", methods=["GET", "POST"])
@@ -225,36 +170,64 @@ def submit_assignment_nosql_for_student(student_id):
         now=current_time,
     )
 
+#### Grading assignment
+@assignments_bp.route("/grade-assignment-sql/<mentor_id>", methods=["GET", "POST"])
+def grade_assignments_sql_for_mentor(mentor_id):
+    conn = get_mysql_connection()
+    cursor = conn.cursor(dictionary=True)
 
-# ─── Assignment Grading ───────────────────────────────
-@assignments_bp.route("/grade_assignment_nosql", methods=["GET", "POST"])
-def grade_assignment_nosql_select_mentor():
-    db = get_mongo_connection()
-    employees_col = db["employees"]
-
-    mentors = list(
-        employees_col.find(
-            {"role": "mentor"},
-            {"employee_id": 1, "first_name": 1, "last_name": 1, "_id": 0},
-        )
+    # Get students supervised by this mentor
+    cursor.execute(
+        """
+        SELECT student_id, first_name, last_name
+        FROM student
+        WHERE mentor = %s
+    """,
+        (mentor_id,),
     )
+    students = cursor.fetchall()
 
-    mentor_id = [{"mentor_id": mentor.get("employee_id")} for mentor in mentors]
+    # Get assignments from those students that have been submitted
+    cursor.execute(
+        """
+        SELECT a.assignment_id, a.from_student, s.first_name, s.last_name, a.submission_date
+        FROM assignment a
+        JOIN student s ON a.from_student = s.student_id
+        WHERE s.mentor = %s AND a.submission_date IS NOT NULL
+          AND a.assignment_id NOT IN (SELECT assignment_id FROM checked_assignments)
+    """,
+        (mentor_id,),
+    )
+    assignments = cursor.fetchall()
 
     if request.method == "POST":
-        mentor_id = request.form["mentor_id"]
-        print(mentor_id)
-        return redirect(
-            url_for(
-                "assignments.grade_assignment_nosql_for_mentor", mentor_id=mentor_id
-            )
+        # assignment_id = request.form["assignment_id"]
+        raw_assignment_id = request.form["assignment_id"]
+        assignment_id = raw_assignment_id.split("::")[0]  # handles both "AS0001" and "AS0001::ST0001"
+
+        grade = int(request.form["grade"])
+        checked_date = datetime.now()
+
+        cursor.execute(
+            """
+            INSERT INTO checked_assignments (assignment_id, mentor_id, grade, checked_date)
+            VALUES (%s, %s, %s, %s)
+        """,
+            (assignment_id, mentor_id, grade, checked_date),
         )
 
-    return render_template("select_mentor.html", mentors=mentor_id)
+        conn.commit()
+        conn.close()
+        return redirect("/tables")
+
+    conn.close()
+    return render_template(
+        "grade_assignment.html", assignments=assignments, mentor_id=mentor_id
+    )
 
 
 @assignments_bp.route("/grade-assignment-nosql/<mentor_id>", methods=["GET", "POST"])
-def grade_assignment_nosql_for_mentor(mentor_id):
+def grade_assignments_nosql_for_mentor(mentor_id):
     db = get_mongo_connection()
     students_col = db["students"]
     now = datetime.now()
@@ -316,3 +289,96 @@ def grade_assignment_nosql_for_mentor(mentor_id):
     return render_template(
         "grade_assignment.html", assignments=assignments, mentor_id=mentor_id, now=now
     )
+
+
+# ──────────── Helper function ────────────
+def get_students_sql():
+    conn = get_mysql_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT student_id, first_name, last_name FROM student")
+    students = cursor.fetchall()
+    conn.close()
+    return students
+
+def get_students_nosql():
+    db = get_mongo_connection()
+    return list(db["students"].find({}, {"student_id": 1, "first_name": 1, "last_name": 1, "_id": 0}))
+
+def get_mentors_sql():
+    conn = get_mysql_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT mentor_id, first_name, last_name FROM mentor ORDER BY first_name, last_name")
+    mentors = cursor.fetchall()
+    conn.close()
+    return mentors
+
+def get_mentors_nosql():
+    db = get_mongo_connection()
+    employees_col = db["employees"]
+    mentors_raw = list(employees_col.find(
+        {"role": "mentor"},
+        {"employee_id": 1, "first_name": 1, "last_name": 1, "_id": 0}
+    ).sort([("first_name", ASCENDING), ("last_name", ASCENDING)]))
+    mentors = [{"mentor_id": m.get("employee_id"), "first_name": m.get("first_name"), "last_name": m.get("last_name")} for m in mentors_raw]
+    return mentors
+
+
+def get_student_name(student_id, db_mode):
+    if db_mode == 'nosql':
+        db = get_mongo_connection()
+        student = db["students"].find_one({"student_id": student_id}, {"first_name": 1, "last_name": 1})
+        if student:
+            return f"{student.get('first_name')} {student.get('last_name')}"
+    else:
+        conn = get_mysql_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT first_name, last_name FROM student WHERE student_id = %s", (student_id,))
+        result = cursor.fetchone()
+        conn.close()
+        if result:
+            return f"{result['first_name']} {result['last_name']}"
+    return "Guest Student"
+
+def get_mentor_name(mentor_id, db_mode):
+    if db_mode == 'nosql':
+        db = get_mongo_connection()
+        mentor = db["employees"].find_one({"employee_id": mentor_id, "role": "mentor"}, {"first_name": 1, "last_name": 1})
+        if mentor:
+            return f"{mentor.get('first_name')} {mentor.get('last_name')}"
+    else:
+        conn = get_mysql_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT first_name, last_name FROM mentor WHERE mentor_id = %s", (mentor_id,))
+        result = cursor.fetchone()
+        conn.close()
+        if result:
+            return f"{result['first_name']} {result['last_name']}"
+    return "Guest Mentor"
+
+def get_mentor_details_sql(mentor_id):
+    conn = get_mysql_connection()
+    mentor_info = None
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT mentor_id, first_name, last_name FROM mentor WHERE mentor_id = %s", (mentor_id,))
+    mentor_info = cursor.fetchone()
+
+    return mentor_info
+
+def get_mentor_details_nosql(mentor_id):
+    db = get_mongo_connection()
+    mentor_info = None
+    employees_col = db["employees"]
+    mentor_info_raw = employees_col.find_one(
+        {"employee_id": mentor_id, "role": "mentor"},
+        {"employee_id": 1, "first_name": 1, "last_name": 1, "_id": 0}
+    )
+    # Adapt to match SQL structure expected by session
+    if mentor_info_raw:
+        mentor_info = {
+            "mentor_id": mentor_info_raw["employee_id"],
+            "first_name": mentor_info_raw["first_name"],
+            "last_name": mentor_info_raw["last_name"]
+        }
+
+    return mentor_info

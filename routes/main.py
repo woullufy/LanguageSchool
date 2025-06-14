@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, session, request
 from db_connections import get_mysql_connection, get_mongo_connection
 from migration.migrate_all import run_full_migration
 import subprocess
@@ -7,7 +7,6 @@ main_bp = Blueprint("main", __name__)
 
 
 @main_bp.route("/generate-data")
-
 def generate_data():
     try:
         subprocess.run(["python", "data_generator.py"], check=True)
@@ -64,6 +63,21 @@ def show_tables_employees():
     employees_collection = db["employees"]
     employees = list(employees_collection.find({}))
     return render_template("employees_mongo.html", employees=employees)
+
+@main_bp.route("/set-db-mode", methods=["POST"])
+def set_db_mode():
+    mode = request.form.get("db_mode")
+    if mode in ["sql", "nosql"]:
+        session['active_db_mode'] = mode
+        flash(f"Application mode set to: {'SQL (MariaDB)' if mode == 'sql' else 'NoSQL (MongoDB)'}", "success")
+    else:
+        flash("Invalid database mode selected.", "danger")
+    return redirect(url_for("main.admin_dashboard"))
+
+
+@main_bp.route("/admin-dashboard")
+def admin_dashboard():
+    return render_template("admin_dashboard.html")
 
 
 @main_bp.route("/")
