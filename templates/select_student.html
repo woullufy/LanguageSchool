@@ -6,7 +6,7 @@
     <title>Select Student Account</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
 </head>
-<body>
+<body class="{% if db_mode %}{{ db_mode }}-background{% else %}neutral-background{% endif %}">
     <div class="selection-container">
         <h2>Who are you? Please Select Your Student Account</h2>
 

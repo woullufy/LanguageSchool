@@ -5,60 +5,28 @@
     padding: 0;
 }
 
-.admin-section.db-mode-selector {
-    text-align: center;
-    border: 2px solid #007bff; /* Highlight this section */
-    background-color: #e9f5ff; /* Lighter blue background */
+body.sql-background {
+    background-color: #d33e3e;
 }
 
-.db-mode-selector h2 .icon {
-    color: #007bff; /* Icon color for this section */
+body.nosql-background {
+    background-color: #5cbe66;
 }
 
-.db-mode-selector p {
-    font-size: 1.05em;
-    color: #444;
-    margin-bottom: 20px;
+body.neutral-background {
+    background-color: #235682;
 }
 
-.db-mode-form {
-    display: flex;
-    justify-content: center;
-    gap: 20px; /* Space between the mode buttons */
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-}
-
-.db-mode-form button {
-    background-color: #6c757d; /* Default button color */
-    box-shadow: 0 3px 8px rgba(108, 117, 125, 0.2);
-    flex-grow: 1; /* Allow buttons to grow */
-    max-width: 250px; /* Max width for individual buttons */
-    padding: 14px 20px;
-    font-size: 1.1em;
-}
-
-.db-mode-form button:hover {
-    background-color: #5a6268;
-}
-
-.db-mode-form button.active-mode {
-    background-color: #007bff; /* Blue for active SQL */
-    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
-    border: 2px solid #0056b3;
-    font-weight: bold;
-    transform: translateY(-2px);
-}
-.db-mode-form button[value="nosql"].active-mode {
-    background-color: #28a745; /* Green for active NoSQL */
-    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
-    border: 2px solid #218838;
-}
-
+/* --- Base Body Styles (should apply *after* specific backgrounds if you want a default) ---
+   However, if you're always applying a class (sql-background, nosql-background, or neutral-background)
+   via Flask, then this 'body' rule setting a background-color directly isn't strictly necessary.
+   I've kept your original #f0f2f5 here, assuming 'neutral-background' will align with it.
+*/
 body {
     font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.6;
     color: #333;
-    background-color: #f0f2f5; /* Light grey background */
+    background-color: #f0f2f5;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -66,6 +34,24 @@ body {
     padding: 20px;
 }
 
+/* Ensure the main content containers have a solid background to stand out */
+.admin-dashboard-container,
+.student-dashboard-container,
+.selection-container,
+.admin-section,
+.dashboard-section,
+.role-card,
+.action-card,
+.group-registration-container, /* From student_management.py template */
+.admin-selection-container,   /* From student_management.py template */
+table {
+    background-color: #ffffff; /* Solid white background for content containers */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Consistent shadow */
+    /* Add padding/margin as needed for your specific layout */
+}
+
+
+/* --- Global Typography and Element Styles --- */
 h1, h2, h3 {
     font-weight: 600;
     color: #2c3e50; /* Darker blue-grey for headings */
@@ -268,7 +254,6 @@ button:disabled {
 .admin-dashboard-container,
 .student-dashboard-container,
 .selection-container {
-    background-color: #ffffff;
     border-radius: 18px; /* More rounded corners */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     padding: 45px;
@@ -302,7 +287,7 @@ button:disabled {
     padding: 30px;
     border: 1px solid #e0e0e0;
     border-radius: 12px;
-    background-color: #fdfdfd;
+    /* background-color: #fdfdfd; - Removed, handled by .admin-dashboard-container etc. */
     text-align: left;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
@@ -315,6 +300,57 @@ button:disabled {
     padding-bottom: 10px;
     display: inline-block;
 }
+
+/* Admin DB Mode Selector - Specific Styles */
+.admin-section.db-mode-selector {
+    text-align: center;
+    border: 2px solid #007bff; /* Highlight this section */
+    /* background-color: #e9f5ff; - Removed, handled by .admin-dashboard-container etc. */
+}
+
+.db-mode-selector h2 .icon {
+    color: #007bff; /* Icon color for this section */
+}
+
+.db-mode-selector p {
+    font-size: 1.05em;
+    color: #444;
+    margin-bottom: 20px;
+}
+
+.db-mode-form {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Space between the mode buttons */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.db-mode-form button {
+    background-color: #6c757d; /* Default button color */
+    box-shadow: 0 3px 8px rgba(108, 117, 125, 0.2);
+    flex-grow: 1; /* Allow buttons to grow */
+    max-width: 250px; /* Max width for individual buttons */
+    padding: 14px 20px;
+    font-size: 1.1em;
+}
+
+.db-mode-form button:hover {
+    background-color: #5a6268;
+}
+
+.db-mode-form button.active-mode {
+    background-color: #007bff; /* Blue for active SQL */
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+    border: 2px solid #0056b3;
+    font-weight: bold;
+    transform: translateY(-2px);
+}
+.db-mode-form button[value="nosql"].active-mode {
+    background-color: #28a745; /* Green for active NoSQL */
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+    border: 2px solid #218838;
+}
+
 
 /* --- Action Grid for Buttons within Dashboards --- */
 .button-grid, .action-grid {
@@ -340,7 +376,7 @@ button:disabled {
 
 /* --- Action Card for Student Dashboard --- */
 .action-card {
-    background-color: #fefefe;
+    /* background-color: #fefefe; - Removed, handled by .admin-dashboard-container etc. */
     border: 1px solid #e5e5e5;
     border-radius: 12px;
     padding: 30px;
@@ -406,7 +442,7 @@ button:disabled {
 .action-card.coming-soon .icon { color: #a0a0a0; }
 
 
-/* --- Selection Page (select_student.html) --- */
+/* --- Selection Page (select_student.html, select_mentor.html) --- */
 .selection-container label {
     font-size: 1.1em;
     color: #555;
@@ -546,16 +582,306 @@ button:disabled {
     .role-card .icon { font-size: 3.5em; }
     .role-card h2 { font-size: 1.5em; }
     .role-card button { font-size: 1em; padding: 12px 15px; }
+}
 
-    .admin-dashboard-container,
-    .student-dashboard-container,
-    .selection-container {
-        padding: 20px;
-        gap: 15px;
+/* --- Styles for submit_assignment.html --- */
+
+/* Main container for centering content */
+.container {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    margin: 40px auto; /* Center the container with some top/bottom margin */
+    max-width: 900px; /* Limit width for readability */
+    width: 90%; /* Responsive width */
+    text-align: center; /* Center h2 and form elements */
+}
+
+.container h2 {
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-size: 2.2em;
+}
+
+/* Home button styling */
+.home-button-form {
+    margin-bottom: 30px;
+}
+
+/* Base button styles (reusing/refining from your existing ones) */
+.button {
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.button:hover {
+    transform: translateY(-1px);
+}
+
+.button-primary {
+    background-color: #007bff; /* Blue for primary actions (Submit) */
+    color: white;
+}
+
+.button-primary:hover {
+    background-color: #0056b3;
+}
+
+.button-secondary {
+    background-color: #6c757d; /* Grey for secondary actions (Home) */
+    color: white;
+}
+
+.button-secondary:hover {
+    background-color: #5a6268;
+}
+
+.button-disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Table styling */
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.95em;
+    min-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    border-radius: 10px; /* Rounded corners for the table */
+    overflow: hidden; /* Ensures rounded corners apply to content */
+}
+
+.styled-table thead tr {
+    background-color: #007bff;
+    color: #ffffff;
+    text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 12px 15px;
+    border: 1px solid #dddddd; /* Light border for cells */
+}
+
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3; /* Zebra striping */
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid #007bff;
+}
+
+.styled-table tbody tr.overdue {
+    background-color: #f8d7da; /* Light red for overdue */
+    color: #721c24; /* Dark red text */
+    font-weight: bold;
+}
+
+.styled-table tbody tr.overdue .badge {
+    border-color: #721c24; /* Make badge border visible against red background */
+}
+
+/* Badge styling for status */
+.badge {
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-block;
+    min-width: 120px; /* Consistent width for badges */
+    text-align: center;
+}
+
+.badge-submitted {
+    background-color: #e2f0d9; /* Light green */
+    color: #28a745; /* Darker green */
+    border: 1px solid #28a745;
+}
+
+.badge-pending {
+    background-color: #fff3cd; /* Light yellow */
+    color: #ffc107; /* Darker yellow */
+    border: 1px solid #ffc107;
+}
+
+/* Ensure table buttons are sized correctly */
+.styled-table td form {
+    margin: 0; /* Remove default form margin */
+    display: inline-block; /* Keep button inline with other table content */
+}
+
+.styled-table td .button {
+    padding: 8px 15px; /* Smaller padding for table buttons */
+    font-size: 0.9em;
+}
+
+/* Responsive adjustments for tables */
+@media (max-width: 768px) {
+    .styled-table {
+        font-size: 0.85em;
     }
-    .admin-dashboard-container h1,
-    .student-dashboard-container h1,
-    .selection-container h2 {
-        font-size: 1.6em;
+    .styled-table th, .styled-table td {
+        padding: 8px 10px;
+    }
+    .container {
+        padding: 25px;
+        margin: 20px auto;
+    }
+    .container h2 {
+        font-size: 1.8em;
+    }
+    .badge {
+        min-width: 100px;
+        padding: 5px 8px;
+        font-size: 0.8em;
+    }
+    .styled-table td .button {
+        padding: 6px 12px;
+        font-size: 0.85em;
+    }
+}
+
+@media (max-width: 480px) {
+    .styled-table, .styled-table thead, .styled-table tbody, .styled-table th, .styled-table td, .styled-table tr {
+        display: block; /* Make table elements stack for small screens */
+    }
+    .styled-table thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    .styled-table tr {
+        margin-bottom: 15px;
+        border: 1px solid #dddddd;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .styled-table td {
+        border: none;
+        position: relative;
+        padding-left: 50%; /* Space for the "label" */
+        text-align: right;
+    }
+    .styled-table td::before {
+        content: attr(data-label); /* Use data-label for content */
+        position: absolute;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+        color: #007bff;
+    }
+    /* Add data-label attributes to your HTML <td> elements for this to work */
+    /* Example: <td data-label="Assignment ID">{{ a.assignment_id }}</td> */
+    .styled-table tbody tr.overdue td::before {
+        color: #721c24; /* Overdue label color */
+    }
+}
+
+/* Add these new styles to your existing app_styles.css */
+
+/* Styling for the grade input field */
+.grade-form {
+    display: flex; /* Use flexbox to align input and button horizontally */
+    align-items: center;
+    gap: 10px; /* Space between the input and button */
+    justify-content: center; /* Center items within the form */
+}
+
+.grade-input {
+    width: 80px; /* Fixed width for grade input */
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 0.95em;
+    text-align: center; /* Center the numbers */
+}
+
+/* Hide spinner buttons for number input in WebKit browsers (Chrome, Safari) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.grade-input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Smaller button for inside the table */
+.button-small {
+    padding: 8px 12px; /* Smaller padding */
+    font-size: 0.85em; /* Smaller font size */
+    min-width: unset; /* Remove min-width if inherited from other button styles */
+}
+
+/* Ensure the data-table styling applies consistently */
+.data-table {
+    /* If you have a separate .data-table style, merge it with .styled-table if they are similar.
+       For now, just ensuring it has the core look. */
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.95em;
+    min-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Re-apply table styles you already have from the submit_assignment.html styling */
+.styled-table thead tr {
+    background-color: #007bff;
+    color: #ffffff;
+    text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 12px 15px;
+    border: 1px solid #dddddd;
+}
+
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid #007bff;
+}
+
+/* Responsive adjustments for tables to ensure grade input looks good */
+@media (max-width: 768px) {
+    .grade-form {
+        flex-direction: column; /* Stack input and button vertically on smaller screens */
+        gap: 5px;
+    }
+    .grade-input {
+        width: 100%; /* Make input full width when stacked */
+        max-width: 100px; /* Optional: limit max width if it gets too wide */
     }
 }

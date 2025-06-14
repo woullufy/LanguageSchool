@@ -2,54 +2,56 @@
 <html>
 
 <head>
-  <title>Submit Assignments</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Submit Assignments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
+
 </head>
 
-<body>
+<body class="{% if db_mode %}{{ db_mode }}-background{% else %}neutral-background{% endif %}">
 
-  <h2>📚 Submit Assignments for {{ student_name }}</h2>
+    <h2>📚 Submit Assignments for {{ student_name }}</h2>
 
-  <form action="/" method="get">
-    <button type="submit" , class="submit-button">Home</button>
-  </form>
+    <form action="/" method="get">
+        <button type="submit" , class="submit-button">Home</button>
+    </form>
 
-  <table class="styled-table">
-    <thead>
-      <tr>
-        <th>Assignment ID</th>
-        <th>Due Date</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for a in assignments %}
-      <tr class="{% if not a.submission_date and a.date_due < now %} overdue {% endif %}">
-        <td>{{ a.assignment_id }}</td>
-        <td>{{ a.date_due.strftime('%Y-%m-%d') }}</td>
-        <td>
-          {% if a.submission_date %}
-          <span class="badge submitted">Submitted on {{ a.submission_date.strftime('%Y-%m-%d') }}</span>
-          {% else %}
-          <span class="badge pending">Not submitted</span>
-          {% endif %}
-        </td>
-        <td>
-          {% if not a.submission_date %}
-          <form method="POST">
-            <input type="hidden" name="assignment_id" value="{{ a.assignment_id }}">
-            <input type="hidden" name="student_id" value="{{ student_id }}">
-            <button type="submit" class="submit-button">📤 Submit</button>
-          </form>
-          {% else %}
-          <button class="submit-button" disabled>✅ Done</button>
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Assignment ID</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in assignments %}
+            <tr class="{% if not a.submission_date and a.date_due < now %} overdue {% endif %}">
+                <td>{{ a.assignment_id }}</td>
+                <td>{{ a.date_due.strftime('%Y-%m-%d') }}</td>
+                <td>
+                    {% if a.submission_date %}
+                    <span class="badge submitted">Submitted on {{ a.submission_date.strftime('%Y-%m-%d') }}</span>
+                    {% else %}
+                    <span class="badge pending">Not submitted</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not a.submission_date %}
+                    <form method="POST">
+                        <input type="hidden" name="assignment_id" value="{{ a.assignment_id }}">
+                        <input type="hidden" name="student_id" value="{{ student_id }}">
+                        <button type="submit" class="submit-button">📤 Submit</button>
+                    </form>
+                    {% else %}
+                    <button class="submit-button" disabled>✅ Done</button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
 </body>
 

@@ -67,17 +67,14 @@ def show_tables_employees():
 @main_bp.route("/set-db-mode", methods=["POST"])
 def set_db_mode():
     mode = request.form.get("db_mode")
-    if mode in ["sql", "nosql"]:
-        session['active_db_mode'] = mode
-        flash(f"Application mode set to: {'SQL (MariaDB)' if mode == 'sql' else 'NoSQL (MongoDB)'}", "success")
-    else:
-        flash("Invalid database mode selected.", "danger")
+    session['active_db_mode'] = mode
     return redirect(url_for("main.admin_dashboard"))
 
 
 @main_bp.route("/admin-dashboard")
 def admin_dashboard():
-    return render_template("admin_dashboard.html")
+    db_mode = session.get('active_db_mode', 'sql')
+    return render_template("admin_dashboard.html", db_mode=db_mode)
 
 
 @main_bp.route("/")

@@ -1,36 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administrator Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
 </head>
-<body>
+<body class="{% if db_mode %}{{ db_mode }}-background{% else %}neutral-background{% endif %}">
     <div class="admin-dashboard-container">
         <h1>Administrator Dashboard</h1>
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-
         <div class="admin-section db-mode-selector">
             <h2><span class="icon">⚙️</span> Application Database Mode</h2>
-            <p>Current Active Mode: <strong>
-                {% if current_db_mode == 'sql' %}
-                    SQL (MariaDB)
-                {% elif current_db_mode == 'nosql' %}
-                    NoSQL (MongoDB)
-                {% else %}
-                    Not Set (Defaulting to SQL)
-                {% endif %}
-            </strong></p>
             <p>Select which database type the application should primarily interact with:</p>
             <form action="{{ url_for('main.set_db_mode') }}" method="post" class="db-mode-form">
                 <button type="submit" name="db_mode" value="sql"

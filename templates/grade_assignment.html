@@ -1,77 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grade Assignments - {{ mentor_name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <div class="mentor-dashboard-container">
+
+<body class="{% if db_mode %}{{ db_mode }}-background{% else %}neutral-background{% endif %}">
+
+    <div class="mentor-dashboard-container container"> {# Added 'container' class for general styling #}
         <h1>Grade Assignments</h1>
         <p class="student-id-display">Mentor: {{ mentor_name }} (ID: {{ mentor_id }})</p>
-        <p class="db-mode-display">Active Database Mode: <strong>
-            {% if db_mode == 'sql' %}
-                SQL (MariaDB)
-            {% elif db_mode == 'nosql' %}
-                NoSQL (MongoDB)
-            {% else %}
-                Unknown
-            {% endif %}
-        </strong></p>
 
         <div class="dashboard-section">
             <h2>Assignments to Grade ({{ "SQL" if db_mode == 'sql' else "NoSQL" }})</h2>
             {% if assignments %}
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Student ID</th>
-                            <th>Student Name</th>
-                            <th>Assignment ID</th>
-                            <th>Submission Date</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for assignment in assignments %}
-                            <tr>
-                                <td data-label="Student ID">{{ assignment.from_student }}</td>
-                                <td data-label="Student Name">{{ assignment.first_name }} {{ assignment.last_name }}</td>
-                                <td data-label="Assignment ID">{{ assignment.assignment_id }}</td>
-                                <td data-label="Submission Date">
-                                    {{ assignment.submission_date.strftime('%Y-%m-%d %H:%M') if assignment.submission_date else 'N/A' }}
-                                </td>
-                                <td data-label="Action">
-                                    <form action="{{ url_for('assignments.grade_assignments_sql_for_mentor', mentor_id=mentor_id) if db_mode == 'sql' else url_for('assignments.grade_assignments_nosql_for_mentor', mentor_id=mentor_id) }}" method="post" class="inline-form">
-                                        <input type="hidden" name="assignment_id" value="{{ assignment.assignment_id }}">
-                                        <input type="hidden" name="student_id" value="{{ assignment.from_student }}">
-                                        <select name="grade" required>
-                                            <option value="">Grade</option>
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-                                            <option value="4">4</option>
-                                            <option value="5">5</option>
-                                        </select>
-                                        <button type="submit" class="submit-button">Submit Grade</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <table class="data-table styled-table"> {# Added 'styled-table' for consistent look #}
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Assignment ID</th>
+                        <th>Submission Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for assignment in assignments %}
+                    <tr>
+                        <td data-label="Student ID">{{ assignment.from_student }}</td>
+                        <td data-label="Student Name">{{ assignment.first_name }} {{ assignment.last_name }}</td>
+                        <td data-label="Assignment ID">{{ assignment.assignment_id }}</td>
+                        <td data-label="Submission Date">
+                            {{ assignment.submission_date.strftime('%Y-%m-%d %H:%M') if assignment.submission_date else
+                            'N/A' }}
+                        </td>
+                        <td data-label="Action">
+                            <form
+                                action="{{ url_for('assignments.grade_assignments_sql_for_mentor', mentor_id=mentor_id) if db_mode == 'sql' else url_for('assignments.grade_assignments_nosql_for_mentor', mentor_id=mentor_id) }}"
+                                method="post" class="grade-form"> {# Changed class to 'grade-form' #}
+                                <input type="hidden" name="assignment_id" value="{{ assignment.assignment_id }}">
+                                <input type="hidden" name="student_id" value="{{ assignment.from_student }}">
+                                
+                                <input type="number" 
+                                       name="grade" 
+                                       placeholder="0-100" 
+                                       min="0" 
+                                       max="100" 
+                                       required 
+                                       class="grade-input">
+                                
+                                <button type="submit" class="button button-primary button-small">Submit Grade</button> 
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
             {% else %}
-                <p>No {{ "SQL" if db_mode == 'sql' else "NoSQL" }} assignments awaiting grading for you.</p>
-                <p>Ensure students you mentor have submitted assignments and they are not yet graded.</p>
+            <p>No {{ "SQL" if db_mode == 'sql' else "NoSQL" }} assignments awaiting grading for you.</p>
+            <p>Ensure students you mentor have submitted assignments and they are not yet graded.</p>
             {% endif %}
         </div>
 
         <div class="back-to-main-menu">
-            <form action="{{ url_for('assignments.mentor_dashboard') }}" method="get">
-                <button type="submit">Back to Mentor Dashboard</button>
+            {# Assuming you have a mentor_dashboard route. If not, link to 'main.index' or 'assignments.grade_assignment_sql_select_mentor' (if that's the mentor selection page) #}
+            <form action="{{ url_for('main.index') }}" method="get"> {# Changed to main.index as mentor_dashboard route wasn't provided #}
+                <button type="submit" class="button button-secondary">Back to Main Menu</button>
             </form>
         </div>
     </div>
 </body>
+
 </html>

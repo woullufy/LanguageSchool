@@ -1,24 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ mentor_name }}'s Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
 </head>
-<body>
+
+<body class="{% if db_mode %}{{ db_mode }}-background{% else %}neutral-background{% endif %}">
     <div class="dashboard-container">
         <h1>Welcome, Mentor {{ mentor_name }}!</h1>
         <p class="role-display">Mentor ID: {{ mentor_id }}</p>
-        <p class="db-mode-display">Active Database Mode: <strong>
-            {% if db_mode == 'sql' %}
-                SQL (MariaDB)
-            {% elif db_mode == 'nosql' %}
-                NoSQL (MongoDB)
-            {% else %}
-                Unknown
-            {% endif %}
-        </strong></p>
 
         <div class="dashboard-section">
             <h2>Actions</h2>
@@ -28,14 +21,16 @@
                     <h3>Grade Assignments</h3>
                     <p>Review and grade submitted student assignments.</p>
                     {% if db_mode == 'sql' %}
-                        <a href="{{ url_for('assignments.grade_assignments_sql_for_mentor', mentor_id=mentor_id) }}" class="button">Grade SQL Assignments</a>
+                    <a href="{{ url_for('assignments.grade_assignments_sql_for_mentor', mentor_id=mentor_id) }}"
+                        class="button">Grade SQL Assignments</a>
                     {% elif db_mode == 'nosql' %}
-                        <a href="{{ url_for('assignments.grade_assignments_nosql_for_mentor', mentor_id=mentor_id) }}" class="button">Grade NoSQL Assignments</a>
+                    <a href="{{ url_for('assignments.grade_assignments_nosql_for_mentor', mentor_id=mentor_id) }}"
+                        class="button">Grade NoSQL Assignments</a>
                     {% else %}
-                        <button disabled>Select a DB Mode</button>
+                    <button disabled>Select a DB Mode</button>
                     {% endif %}
                 </div>
-                </div>
+            </div>
         </div>
 
         <div class="back-to-main-menu">
@@ -45,4 +40,5 @@
         </div>
     </div>
 </body>
+
 </html>

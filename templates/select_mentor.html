@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select Mentor</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
 </head>
-<body>
+
+<body class="{% if db_mode %}{{ db_mode }}-background{% else %}neutral-background{% endif %}">
+
     <div class="selection-container">
         <h2>Select Your Mentor Account</h2>
         <p>Please select your mentor ID to proceed to your dashboard.</p>
@@ -16,9 +19,9 @@
             <select name="mentor_id" id="mentor_id" required>
                 <option value="">-- Please Select a Mentor --</option>
                 {% for mentor in mentors %}
-                    <option value="{{ mentor.mentor_id }}">
-                        {{ mentor.first_name }} {{ mentor.last_name }} ({{ mentor.mentor_id }})
-                    </option>
+                <option value="{{ mentor.mentor_id }}">
+                    {{ mentor.first_name }} {{ mentor.last_name }} ({{ mentor.mentor_id }})
+                </option>
                 {% endfor %}
             </select>
             <button type="submit">Proceed to Mentor Dashboard</button>
@@ -31,4 +34,5 @@
         </div>
     </div>
 </body>
+
 </html>
