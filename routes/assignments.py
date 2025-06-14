@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from db_connections import get_mysql_connection, get_mongo_connection
 from datetime import datetime
-from pymongo import ASCENDING
 
 assignments_bp = Blueprint("assignments", __name__)
 
@@ -272,8 +271,9 @@ def grade_assignments_nosql_for_mentor(mentor_id):
                 )
 
     if request.method == "POST":
-        assignment_value = request.form["assignment_id"]
-        assignment_id, student_id = assignment_value.split("::")
+        assignment_id = request.form["assignment_id"]
+        student_id = request.form["student_id"]
+
 
         grade = int(request.form["grade"])
         checked_date = datetime.now().strftime("%Y-%m-%d")
@@ -291,7 +291,7 @@ def grade_assignments_nosql_for_mentor(mentor_id):
         flash("Assignment graded successfully!", "success")
         return redirect(
             url_for(
-                "assignments.grade_assignment_nosql_for_mentor",
+                "assignments.grade_assignments_nosql_for_mentor",
                 mentor_id=mentor_id,
                 db_mode=db_mode,
             )
@@ -346,7 +346,7 @@ def get_mentors_nosql():
         employees_col.find(
             {"role": "mentor"},
             {"employee_id": 1, "first_name": 1, "last_name": 1, "_id": 0},
-        ).sort([("first_name", ASCENDING), ("last_name", ASCENDING)])
+        )
     )
     mentors = [
         {
