@@ -90,7 +90,6 @@ def submit_assignment_for_student(student_id):
         )
         conn.commit()
 
-    # Load student name and all assignments
     cursor.execute(
         "SELECT first_name, last_name FROM student WHERE student_id = %s", (student_id,)
     )
@@ -208,11 +207,10 @@ def grade_assignments_sql_for_mentor(mentor_id):
     assignments = cursor.fetchall()
 
     if request.method == "POST":
-        # assignment_id = request.form["assignment_id"]
         raw_assignment_id = request.form["assignment_id"]
         assignment_id = raw_assignment_id.split("::")[
             0
-        ]  # handles both "AS0001" and "AS0001::ST0001"
+        ]
 
         grade = int(request.form["grade"])
         checked_date = datetime.now()
@@ -256,7 +254,7 @@ def grade_assignments_nosql_for_mentor(mentor_id):
         for a in student.get("assignments", []):
             eval_data = a.get("evaluation", {})
             if a.get("submission_date") and not eval_data.get("grade"):
-                # Build assignment dict to match grade_assignment.html expectations
+
                 try:
                     submission_date = datetime.strptime(
                         a["submission_date"], "%Y-%m-%d"
@@ -455,7 +453,6 @@ def get_mentor_details_nosql(mentor_id):
         {"employee_id": mentor_id, "role": "mentor"},
         {"employee_id": 1, "first_name": 1, "last_name": 1, "_id": 0},
     )
-    # Adapt to match SQL structure expected by session
     if mentor_info_raw:
         mentor_info = {
             "mentor_id": mentor_info_raw["employee_id"],

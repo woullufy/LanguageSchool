@@ -8,11 +8,9 @@ def migrate_employees():
     sql_cursor = sql_conn.cursor(dictionary=True)
     mongo_db.employees.delete_many({})
 
-    # Get employees
     sql_cursor.execute("SELECT * FROM employee")
     all_employees = sql_cursor.fetchall()
 
-    # Get mentors and tutors
     sql_cursor.execute("SELECT * FROM mentor")
     mentors = {m["mentor_id"]: m for m in sql_cursor.fetchall()}
 

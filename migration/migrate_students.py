@@ -8,11 +8,9 @@ def migrate_students():
     sql_cursor = sql_conn.cursor(dictionary=True)
     mongo_db.students.delete_many({})
 
-    # Get students
     sql_cursor.execute("SELECT * FROM student")
     all_students = sql_cursor.fetchall()
 
-    # Get assignments
     sql_cursor.execute("SELECT * FROM assignment")
     assignments = sql_cursor.fetchall()
     assignments_by_student = {}
@@ -22,7 +20,6 @@ def migrate_students():
             assignments_by_student[sid] = []
         assignments_by_student[sid].append(a)
 
-    # Get graded assignments
     sql_cursor.execute("SELECT * FROM checked_assignments")
     checked = {g["assignment_id"]: g for g in sql_cursor.fetchall()}
 

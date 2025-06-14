@@ -8,25 +8,20 @@ def migrate_courses():
     sql_cursor = sql_conn.cursor(dictionary=True)
     mongo_db.courses.delete_many({})
 
-    # Fetch courses
     sql_cursor.execute("SELECT * FROM course")
     courses = sql_cursor.fetchall()
 
-    # Fetch student groups
     sql_cursor.execute("SELECT * FROM student_group")
     all_groups = sql_cursor.fetchall()
 
-    # Fetch group memberships
     sql_cursor.execute("SELECT * FROM group_membership")
     memberships = sql_cursor.fetchall()
 
-    # Organize memberships into lookup
     students_by_group = {}
     for m in memberships:
         key = (m["student_group_id"], m["course_id"])
         students_by_group.setdefault(key, []).append(m["student_id"])
 
-    # Group student_groups by course
     groups_by_course = {}
     for g in all_groups:
         key = g["course_id"]
