@@ -41,6 +41,10 @@ def course_groups(course_id, student_id):
     title = course["title"]
     
     print(groups)
+    joined_ids = []
+    for group in groups:
+        if "students" in group and student_id in group["students"]:
+            joined_ids.append(group["student_group_id"])
 
     db_mode = session.get("active_db_mode", "sql")
 
@@ -51,6 +55,7 @@ def course_groups(course_id, student_id):
         student_id=student_id,
         course_id=course_id,
         db_mode=db_mode,
+        joined_ids= joined_ids
     )
 
 
@@ -74,9 +79,9 @@ def join_group():
     group_data = group_data_res["student_group"][0]
 
     age_category = group_data["age_category"]
-    max_participant = group_data["max_participant"]
+    max_participants = group_data["max_participants"]
 
-    if max_participant <= len(group_data["students"]):
+    if max_participants <= len(group_data["students"]):
         flash("❌ Cannot join: group is full.")
         return redirect(
             url_for(

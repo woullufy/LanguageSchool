@@ -62,6 +62,7 @@ def course_groups(course_id, student_id):
         title=title,
         student_id=student_id,
         joined_ids=joined_ids,
+        course_id=course_id,
         db_mode=db_mode,
     )
 
