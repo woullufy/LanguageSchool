@@ -30,7 +30,6 @@ def migrate_courses():
     for course in courses:
         cid = course["course_id"]
         course_doc = {
-            "course_id": cid,
             "language": course["language"],
             "title": course["title"],
             "level": course["level"],

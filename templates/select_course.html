@@ -39,6 +39,7 @@
                             action="{% if db_mode == 'nosql' %}{{ url_for('student_management_mongo.select_course', student_id=student_id) }}{% else %}{{ url_for('student_management.select_course', student_id=student_id) }}{% endif %}">
 
                             <input type="hidden" name="course_id" value="{{ course.course_id }}">
+                            <input type="hidden" name="id" value="{{course._id}}">
                             <input type="hidden" name="title" value="{{ course.title }}">
                             <input type="hidden" name="student_id" value="{{ student_id }}">
                             <button type="submit" class="button button-primary button-small">Select</button>

@@ -1,3 +1,4 @@
+from bson import ObjectId
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from db_connections import get_mongo_connection
 
@@ -14,7 +15,7 @@ def select_course(student_id):
     db_mode = session.get("active_db_mode", "sql")
 
     if request.method == "POST":
-        course_id = request.form["course_id"]
+        course_id = request.form["id"]
         student_id = request.form["student_id"]
         return redirect(
             url_for(
@@ -35,7 +36,7 @@ def select_course(student_id):
 def course_groups(course_id, student_id):
     db = get_mongo_connection()
     course = db["courses"].find_one(
-        {"course_id": course_id}, {"_id": 0, "student_group": 1, "title": 1}
+        {"_id": ObjectId(course_id)}, {"_id": 0, "student_group": 1, "title": 1}
     )
     groups = course["student_group"] if course else []
     title = course["title"]
@@ -69,7 +70,7 @@ def join_group():
     student_id = request.form["student_id"]
 
     group_data_res = db["courses"].find_one(
-        {"course_id": course_id},
+        {"_id": ObjectId(course_id)},
         {
             "_id": 0,
             "student_group": {"$elemMatch": {"student_group_id": student_group_id}},
@@ -103,11 +104,11 @@ def join_group():
         )
 
     db["courses"].update_one(
-        {"course_id": course_id, "student_group.student_group_id": student_group_id},
+        {"_id": ObjectId(course_id), "student_group.student_group_id": student_group_id},
         {"$push": {"student_group.$.students": student_id}},
     )
     db["courses"].update_one(
-        {"course_id": course_id, "student_group.student_group_id": student_group_id},
+        {"_id": ObjectId(course_id), "student_group.student_group_id": student_group_id},
         {"$inc": {"student_group.$.amount_of_participants": 1}},
     )
 
