@@ -1,14 +1,10 @@
-version: "3.9"
-
 services:
   flask:
-    build: 
+    build:
       context: ..
       dockerfile: docker/Dockerfile
     ports:
       - "5050:5050"
-    volumes:
-      - ../:/app
     working_dir: /app
     command: python -u app.py
     depends_on:
@@ -26,7 +22,8 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./createtable.sql:/docker-entrypoint-initdb.d/createtable.sql
+      - ./createtable.sql:/docker-entrypoint-initdb.d/createtable.sql:ro
+      - mariadb-data:/var/lib/mysql
 
   mongodb:
     image: mongo:7
@@ -34,5 +31,8 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - ./mongo-data:/data/db
- 
+      - mongodb-data:/data/db
+
+volumes:
+  mariadb-data:
+  mongodb-data:
