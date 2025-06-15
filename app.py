@@ -6,8 +6,7 @@ from routes.student_management import student_management_bp
 from routes.student_management_mongo import student_management_mongo_bp
 
 app = Flask(__name__)
-app.secret_key = "supersecretkey123"
-app.config['SECRET_KEY'] = 'a_very_long_and_random_secret_key_for_security' 
+app.config['SECRET_KEY'] = 'supersecretkey123' 
 
 app.register_blueprint(main_bp)
 app.register_blueprint(reports_bp)

@@ -1,5 +1,14 @@
 # Flask Language School App
 
+# This application is a containerized web system for managing online language school, using:
+- Flask (Python)
+- MariaDB (SQL)
+- MongoDB (NoSQL)
+
+### Requirements
+- Docker
+- Docker Compose
+
 ## How to Run
 
 1. Go to the `docker/` folder where all Docker-related files are located:
