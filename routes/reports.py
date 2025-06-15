@@ -102,7 +102,10 @@ def nosql_graded_report():
         {"$sort": {"grade": -1}},
     ]
 
+    db.employees.create_index([("employee_id", 1)])
+
     results = list(db.students.aggregate(pipeline))
+
     return render_template(
         "reports/graded_assignments.html",
         results=results,

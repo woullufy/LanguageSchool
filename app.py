@@ -1,4 +1,4 @@
-from flask import Flask, session
+from flask import Flask
 from routes.main import main_bp
 from routes.reports import reports_bp
 from routes.assignments import assignments_bp
@@ -18,4 +18,3 @@ app.register_blueprint(student_management_mongo_bp)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5050, debug=True)
-    # app.run(debug=True)
