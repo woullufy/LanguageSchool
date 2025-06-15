@@ -201,12 +201,12 @@ def grade_assignments_sql_for_mentor(mentor_id):
 
     cursor.execute(
         """
-        SELECT a.assignment_id, a.from_student, s.first_name, s.last_name, a.submission_date
+        SELECT a.assignment_id, a.from_student, s.first_name, s.last_name, a.submission_date, a.date_due
         FROM assignment a
         JOIN student s ON a.from_student = s.student_id
         WHERE s.mentor = %s AND a.submission_date IS NOT NULL
-          AND a.assignment_id NOT IN (SELECT assignment_id FROM checked_assignments)
-    """,
+        AND a.assignment_id NOT IN (SELECT assignment_id FROM checked_assignments)
+        """,
         (mentor_id,),
     )
     assignments = cursor.fetchall()
