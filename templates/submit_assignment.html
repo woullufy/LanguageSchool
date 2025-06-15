@@ -42,7 +42,7 @@
                     <td>
                         {% if not a.submission_date %}
                         <form method="POST">
-                            <!-- <input type="hidden" name="assignment_id" value="{{ a.assignment_id }}"> -->
+                            <input type="hidden" name="assignment_id" value="{{ a.assignment_id }}">
                             <input type="hidden" name="student_id" value="{{ student_id }}">
                             <button type="submit" class="button button-primary button-small">📤 Submit</button>
                         </form>
