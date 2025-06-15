@@ -57,25 +57,25 @@ def sql_graded_report():
 
 @reports_bp.route("/nosql-graded-report", methods=["GET", "POST"])
 def nosql_graded_report():
-    threshold = 70
-    mode = "above"
+    threshold = int(request.form.get("threshold", 0))
+    mode = request.form.get("mode", "above")
 
-    if request.method == "POST":
-        try:
-            threshold = int(request.form["threshold"])
-            mode = request.form.get("mode", "above")
-        except ValueError:
-            pass
+    grade_filter = {"$gte": threshold} if mode == "above" else {"$lt": threshold}
 
     db = get_mongo_connection()
-    students_col = db["students"]
-    employees_col = db["employees"]
-
-    comparator = "$gte" if mode == "above" else "$lt"
 
     pipeline = [
         {"$unwind": "$assignments"},
-        {"$match": {f"assignments.evaluation.grade": {comparator: threshold}}},
+        {
+            "$addFields": {
+                "assignment_id": "$assignments.assignment_id",
+                "grade": "$assignments.evaluation.grade",
+                "submission_date": "$assignments.submission_date",
+                "date_due": "$assignments.date_due",
+                "checked_date": "$assignments.evaluation.checked_date",
+            }
+        },
+        {"$match": {"grade": grade_filter}},
         {
             "$lookup": {
                 "from": "employees",
@@ -84,19 +84,17 @@ def nosql_graded_report():
                 "as": "mentor_info",
             }
         },
-        {"$unwind": "$mentor_info"},
+        {"$unwind": {"path": "$mentor_info", "preserveNullAndEmptyArrays": True}},
         {
             "$project": {
-                "student_id": 1,
-                "first_name": 1,
-                "last_name": 1,
-                "assignment_id": "$assignments.assignment_id",
-                "grade": "$assignments.evaluation.grade",
-                "checked_date": "$assignments.evaluation.checked_date",
-                "submission_date": "$assignments.submission_date",
-                "date_due": "$assignments.date_due",
-                "date_issued": "$assignments.date_issued",
-                "mentor_id": "$mentor_id",
+                "_id": 0,
+                "assignment_id": 1,
+                "grade": 1,
+                "student_first_name": "$first_name",
+                "student_last_name": "$last_name",
+                "submission_date": 1,
+                "date_due": 1,
+                "checked_date": 1,
                 "mentor_first_name": "$mentor_info.first_name",
                 "mentor_last_name": "$mentor_info.last_name",
             }
@@ -104,8 +102,7 @@ def nosql_graded_report():
         {"$sort": {"grade": -1}},
     ]
 
-    results = list(students_col.aggregate(pipeline))
-
+    results = list(db.students.aggregate(pipeline))
     return render_template(
         "reports/graded_assignments.html",
         results=results,

@@ -97,7 +97,7 @@ def submit_assignment_for_student(student_id):
 
     cursor.execute(
         """
-        SELECT assignment_id, date_due, submission_date
+        SELECT assignment_id, date_issued, date_due, submission_date
         FROM assignment
         WHERE from_student = %s
     """,
@@ -150,6 +150,11 @@ def submit_assignment_nosql_for_student(student_id):
         for assign in student_doc.get("assignments", []):
             adapted_assignment = {
                 "assignment_id": assign.get("assignment_id"),
+                "date_issued": (
+                    datetime.strptime(assign.get("date_issued", ""), "%Y-%m-%dT%H:%M:%S")
+                    if assign.get("date_issued")
+                    else None
+                ),
                 "date_due": (
                     datetime.strptime(assign.get("date_due", ""), "%Y-%m-%dT%H:%M:%S")
                     if assign.get("date_due")
@@ -208,9 +213,7 @@ def grade_assignments_sql_for_mentor(mentor_id):
 
     if request.method == "POST":
         raw_assignment_id = request.form["assignment_id"]
-        assignment_id = raw_assignment_id.split("::")[
-            0
-        ]
+        assignment_id = raw_assignment_id.split("::")[0]
 
         grade = int(request.form["grade"])
         checked_date = datetime.now()
@@ -255,12 +258,11 @@ def grade_assignments_nosql_for_mentor(mentor_id):
             eval_data = a.get("evaluation", {})
             if a.get("submission_date") and not eval_data.get("grade"):
 
-                try:
-                    submission_date = datetime.strptime(
-                        a["submission_date"], "%Y-%m-%d"
-                    )
-                except:
-                    submission_date = None
+                submission_date = datetime.strptime(a["submission_date"], "%Y-%m-%dT%H:%M:%S")
+                date_due = datetime.strptime(a["date_due"], "%Y-%m-%dT%H:%M:%S")
+
+
+                print(f"{submission_date} *(************)")
 
                 assignments.append(
                     {
@@ -269,13 +271,13 @@ def grade_assignments_nosql_for_mentor(mentor_id):
                         "first_name": student["first_name"],
                         "last_name": student["last_name"],
                         "submission_date": submission_date,
+                        "date_due": date_due,
                     }
                 )
 
     if request.method == "POST":
         assignment_id = request.form["assignment_id"]
         student_id = request.form["student_id"]
-
         grade = int(request.form["grade"])
         checked_date = datetime.now().strftime("%Y-%m-%d")
 
@@ -296,6 +298,8 @@ def grade_assignments_nosql_for_mentor(mentor_id):
                 db_mode=db_mode,
             )
         )
+
+    print(assignments)
 
     return render_template(
         "grade_assignment.html",
@@ -384,9 +388,7 @@ def get_student_name(student_id, db_mode):
 def get_student_age(student_id, db_mode):
     if db_mode == "nosql":
         db = get_mongo_connection()
-        student = db["students"].find_one(
-            {"student_id": student_id}, {"age": 1}
-        )
+        student = db["students"].find_one({"student_id": student_id}, {"age": 1})
         if student:
             return f"{student.get('age')}"
     else:
@@ -461,3 +463,4 @@ def get_mentor_details_nosql(mentor_id):
         }
 
     return mentor_info
+

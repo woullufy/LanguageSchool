@@ -4,7 +4,6 @@
 <head>
     <title>Grade Assignments - {{ mentor_name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='app_styles.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body class="{% if db_mode %}{{ db_mode }}-background{% else %}neutral-background{% endif %}">
@@ -15,31 +14,35 @@
 
         <div class="dashboard-section">
             <h2>Assignments to Grade ({{ "SQL" if db_mode == 'sql' else "NoSQL" }})</h2>
+
             {% if assignments %}
-            <table class="data-table styled-table"> {# Added 'styled-table' for consistent look #}
+            <table class="data-table styled-table">
                 <thead>
                     <tr>
-                        <th>Student ID</th>
+                        <!-- <th>Student ID</th> -->
                         <th>Student Name</th>
                         <th>Assignment ID</th>
                         <th>Submission Date</th>
+                        <th>Due Date</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for assignment in assignments %}
                     <tr>
-                        <td data-label="Student ID">{{ assignment.from_student }}</td>
+                        <!-- <td data-label="Student ID">{{ assignment.from_student }}</td> -->
                         <td data-label="Student Name">{{ assignment.first_name }} {{ assignment.last_name }}</td>
                         <td data-label="Assignment ID">{{ assignment.assignment_id }}</td>
-                        <td data-label="Submission Date">
-                            {{ assignment.submission_date.strftime('%Y-%m-%d %H:%M') if assignment.submission_date else
-                            'N/A' }}
-                        </td>
+                        <td data-label="Submission Date">{{ assignment.submission_date}}</td>
+                        <td data-label="Due Date">{{ assignment.date_due}}</td>
+
                         <td data-label="Action">
-                            <form
-                                action="{{ url_for('assignments.grade_assignments_sql_for_mentor', mentor_id=mentor_id) if db_mode == 'sql' else url_for('assignments.grade_assignments_nosql_for_mentor', mentor_id=mentor_id) }}"
-                                method="post" class="grade-form"> {# Changed class to 'grade-form' #}
+                            <form action="{% if db_mode == 'sql' %}
+                                            {{ url_for('assignments.grade_assignments_sql_for_mentor', mentor_id=mentor_id) }}
+                                         {% else %}
+                                            {{ url_for('assignments.grade_assignments_nosql_for_mentor', mentor_id=mentor_id) }}
+                                         {% endif %}" method="post" class="grade-form">
+
                                 <input type="hidden" name="assignment_id" value="{{ assignment.assignment_id }}">
                                 <input type="hidden" name="student_id" value="{{ assignment.from_student }}">
 
@@ -54,7 +57,7 @@
                 </tbody>
             </table>
             {% else %}
-            <p>No {{ "SQL" if db_mode == 'sql' else "NoSQL" }} assignments awaiting grading for you.</p>
+            <p>No assignments awaiting grading for you.</p>
             <p>Ensure students you mentor have submitted assignments and they are not yet graded.</p>
             {% endif %}
         </div>

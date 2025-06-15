@@ -20,10 +20,10 @@
                     <p>Review and grade submitted student assignments.</p>
                     {% if db_mode == 'sql' %}
                     <a href="{{ url_for('assignments.grade_assignments_sql_for_mentor', mentor_id=mentor_id) }}"
-                        class="button">Grade SQL Assignments</a>
+                        class="button">Grade Assignments</a>
                     {% elif db_mode == 'nosql' %}
                     <a href="{{ url_for('assignments.grade_assignments_nosql_for_mentor', mentor_id=mentor_id) }}"
-                        class="button">Grade NoSQL Assignments</a>
+                        class="button">Grade Assignments</a>
                     {% else %}
                     <button disabled>Select a DB Mode</button>
                     {% endif %}
