@@ -10,55 +10,67 @@
 
     <div class="mentor-dashboard-container container">
         <h1>Grade Assignments</h1>
-        <p class="student-id-display">Mentor: {{ mentor_name }} (ID: {{ mentor_id }})</p>
+        <p class="student-id-display">Mentor: {{ mentor_name }} </p>
 
         <div class="dashboard-section">
-            <h2>Assignments to Grade ({{ "SQL" if db_mode == 'sql' else "NoSQL" }})</h2>
+            <h2>All Submitted Assignments</h2>
 
             {% if assignments %}
             <table class="data-table styled-table">
                 <thead>
                     <tr>
-                        <!-- <th>Student ID</th> -->
                         <th>Student Name</th>
                         <th>Assignment ID</th>
                         <th>Submission Date</th>
                         <th>Due Date</th>
+                        <th>Grade</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for assignment in assignments %}
                     <tr>
-                        <!-- <td data-label="Student ID">{{ assignment.from_student }}</td> -->
-                        <td data-label="Student Name">{{ assignment.first_name }} {{ assignment.last_name }}</td>
-                        <td data-label="Assignment ID">{{ assignment.assignment_id }}</td>
-                        <td data-label="Submission Date">{{ assignment.submission_date}}</td>
-                        <td data-label="Due Date">{{ assignment.date_due}}</td>
-
-                        <td data-label="Action">
+                        <td>{{ assignment.first_name }} {{ assignment.last_name }}</td>
+                        <td>{{ assignment.assignment_id }}</td>
+                        <td>
+                            {{ assignment.submission_date.strftime('%Y-%m-%d %H:%M') if assignment.submission_date else
+                            'N/A' }}
+                        </td>
+                        <td>
+                            {{ assignment.date_due.strftime('%Y-%m-%d %H:%M') if assignment.date_due else 'N/A' }}
+                        </td>
+                        <td>
+                            {% if assignment.grade is defined and assignment.grade is not none %}
+                            {{ assignment.grade }}
+                            {% else %}
+                            Not yet graded
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if assignment.grade is not defined or assignment.grade is none %}
                             <form action="{% if db_mode == 'sql' %}
-                                            {{ url_for('assignments.grade_assignments_sql_for_mentor', mentor_id=mentor_id) }}
-                                         {% else %}
-                                            {{ url_for('assignments.grade_assignments_nosql_for_mentor', mentor_id=mentor_id) }}
-                                         {% endif %}" method="post" class="grade-form">
+                                              {{ url_for('assignments.grade_assignments_sql_for_mentor', mentor_id=mentor_id) }}
+                                           {% else %}
+                                              {{ url_for('assignments.grade_assignments_nosql_for_mentor', mentor_id=mentor_id) }}
+                                           {% endif %}" method="post" class="grade-form">
 
                                 <input type="hidden" name="assignment_id" value="{{ assignment.assignment_id }}">
                                 <input type="hidden" name="student_id" value="{{ assignment.from_student }}">
-
                                 <input type="number" name="grade" placeholder="0-100" min="0" max="100" required
                                     class="grade-input">
 
                                 <button type="submit" class="button button-primary button-small">Submit Grade</button>
                             </form>
+                            {% else %}
+                            —
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
             {% else %}
-            <p>No assignments awaiting grading for you.</p>
-            <p>Ensure students you mentor have submitted assignments and they are not yet graded.</p>
+            <p>No submitted assignments yet.</p>
             {% endif %}
         </div>
 

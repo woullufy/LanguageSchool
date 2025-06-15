@@ -151,7 +151,9 @@ def submit_assignment_nosql_for_student(student_id):
             adapted_assignment = {
                 "assignment_id": assign.get("assignment_id"),
                 "date_issued": (
-                    datetime.strptime(assign.get("date_issued", ""), "%Y-%m-%dT%H:%M:%S")
+                    datetime.strptime(
+                        assign.get("date_issued", ""), "%Y-%m-%dT%H:%M:%S"
+                    )
                     if assign.get("date_issued")
                     else None
                 ),
@@ -189,32 +191,9 @@ def grade_assignments_sql_for_mentor(mentor_id):
     cursor = conn.cursor(dictionary=True)
     db_mode = session.get("active_db_mode", "sql")
 
-    cursor.execute(
-        """
-        SELECT student_id, first_name, last_name
-        FROM student
-        WHERE mentor = %s
-    """,
-        (mentor_id,),
-    )
-    students = cursor.fetchall()
-
-    cursor.execute(
-        """
-        SELECT a.assignment_id, a.from_student, s.first_name, s.last_name, a.submission_date, a.date_due
-        FROM assignment a
-        JOIN student s ON a.from_student = s.student_id
-        WHERE s.mentor = %s AND a.submission_date IS NOT NULL
-        AND a.assignment_id NOT IN (SELECT assignment_id FROM checked_assignments)
-        """,
-        (mentor_id,),
-    )
-    assignments = cursor.fetchall()
-
     if request.method == "POST":
         raw_assignment_id = request.form["assignment_id"]
         assignment_id = raw_assignment_id.split("::")[0]
-
         grade = int(request.form["grade"])
         checked_date = datetime.now()
 
@@ -225,16 +204,38 @@ def grade_assignments_sql_for_mentor(mentor_id):
         """,
             (assignment_id, mentor_id, grade, checked_date),
         )
-
         conn.commit()
-        conn.close()
-        return redirect("/tables")
+
+        return redirect(
+            url_for("assignments.grade_assignments_sql_for_mentor", mentor_id=mentor_id)
+        )
+
+    cursor.execute(
+        """
+        SELECT 
+            a.assignment_id,
+            a.from_student,
+            s.first_name,
+            s.last_name,
+            a.submission_date,
+            a.date_due,
+            ca.grade,
+            ca.checked_date
+        FROM assignment a
+        JOIN student s ON a.from_student = s.student_id
+        LEFT JOIN checked_assignments ca ON a.assignment_id = ca.assignment_id
+        WHERE s.mentor = %s AND a.submission_date IS NOT NULL
+        """,
+        (mentor_id,),
+    )
+    assignments = cursor.fetchall()
 
     conn.close()
     return render_template(
         "grade_assignment.html",
         assignments=assignments,
         mentor_id=mentor_id,
+        mentor_name=get_mentor_name(mentor_id, db_mode),
         db_mode=db_mode,
     )
 
@@ -243,7 +244,6 @@ def grade_assignments_sql_for_mentor(mentor_id):
 def grade_assignments_nosql_for_mentor(mentor_id):
     db = get_mongo_connection()
     students_col = db["students"]
-    now = datetime.now()
     db_mode = session.get("active_db_mode", "sql")
 
     assignments = []
@@ -256,13 +256,12 @@ def grade_assignments_nosql_for_mentor(mentor_id):
     for student in student_cursor:
         for a in student.get("assignments", []):
             eval_data = a.get("evaluation", {})
-            if a.get("submission_date") and not eval_data.get("grade"):
+            if a.get("submission_date"):
 
-                submission_date = datetime.strptime(a["submission_date"], "%Y-%m-%dT%H:%M:%S")
+                submission_date = datetime.strptime(
+                    a["submission_date"], "%Y-%m-%dT%H:%M:%S"
+                )
                 date_due = datetime.strptime(a["date_due"], "%Y-%m-%dT%H:%M:%S")
-
-
-                print(f"{submission_date} *(************)")
 
                 assignments.append(
                     {
@@ -272,6 +271,8 @@ def grade_assignments_nosql_for_mentor(mentor_id):
                         "last_name": student["last_name"],
                         "submission_date": submission_date,
                         "date_due": date_due,
+                        "grade": eval_data.get("grade"),
+                        "checked_date": eval_data.get("checked_date"),
                     }
                 )
 
@@ -298,8 +299,6 @@ def grade_assignments_nosql_for_mentor(mentor_id):
                 db_mode=db_mode,
             )
         )
-
-    print(assignments)
 
     return render_template(
         "grade_assignment.html",
@@ -463,4 +462,3 @@ def get_mentor_details_nosql(mentor_id):
         }
 
     return mentor_info
-
